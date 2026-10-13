@@ -4,6 +4,7 @@ import CookieBanner from '../components/CookieBanner.astro';
 import ogImage from '../assets/nodiwears.jpeg';
 import { siteConfig } from '../data/site';
 import { getOtherLocale, type Locale } from '../i18n/config';
+import { serializeJsonLd } from '../lib/structured-data';
 import { ui } from '../i18n/ui';
 
 interface Props {
@@ -12,9 +13,10 @@ interface Props {
 	description?: string;
 	alternatePath?: string;
 	noindex?: boolean;
+	structuredData?: readonly object[];
 }
 
-const { locale, title, description, alternatePath, noindex = false } = Astro.props;
+const { locale, title, description, alternatePath, noindex = false, structuredData = [] } = Astro.props;
 const t = ui[locale];
 const pageTitle = title ?? `${siteConfig.name} | ${t.meta.tagline}`;
 const pageDescription = description ?? t.meta.description;
@@ -56,6 +58,7 @@ const defaultAlternate = alternates.find((alternate) => alternate.hreflang === '
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{pageTitle}</title>
+		{structuredData.map((data) => <script type="application/ld+json" set:html={serializeJsonLd(data)} />)}
 	</head>
 	<body>
 		<slot />

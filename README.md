@@ -24,8 +24,8 @@ nodiwears (kendi katalog ve özel tasarım nakışları) için kurumsal tanıtı
 - `src/styles/global.css`: renkler, tipografi ve ortak stiller
 - `src/data/policies/`: KVKK, gizlilik ve çerez politikası metinleri (TR/EN)
 - `wrangler.jsonc`, `public/_headers`, `src/pages/404.astro`: Cloudflare yayın yapılandırması
-- `public/robots.txt`, `src/pages/sitemap.xml.ts`, `src/lib/sitemap.ts`: arama motoru dosyaları
-- `credit/`: özellik spesifikasyonları
+- `public/robots.txt`, `src/pages/sitemap.xml.ts`, `src/lib/sitemap.ts`, `src/lib/structured-data.ts`: arama motoru dosyaları ve JSON-LD
+- `docs/`: özellik spesifikasyonları (teknik `.md` + iş/QA `.html`)
 
 ## Cloudflare'e yayın
 
@@ -35,6 +35,6 @@ Site statiktir; `wrangler.jsonc` ile Cloudflare Workers Static Assets olarak yay
 - **Komut satırı:** `npx wrangler login`, sonra `npm run deploy`.
 - **Cloudflare Pages ile:** build komutu `npm run build`, çıktı dizini `dist`.
 - Güvenlik ve önbellek başlıkları `public/_headers` içindedir. Siteye yeni bir dış kaynak (script, font, görsel) eklerseniz buradaki CSP'yi de güncelleyin.
-- Alan adı `nodiwears.com`: `wrangler.jsonc` içinde özel alan adı olarak tanımlı. Önce alan adını Cloudflare'e ekleyip nameserver'ları değiştirin (bölge "Active" olmalı), sonra `npm run deploy`. `www` → ana adres yönlendirmesi ve e-posta (`merhaba@nodiwears.com`) panelden kurulur; adımlar için `credit/domain-and-seo.md`.
+- Alan adı `nodiwears.com`: `wrangler.jsonc` içinde özel alan adı olarak tanımlı. Önce alan adını Cloudflare'e ekleyip nameserver'ları değiştirin (bölge "Active" olmalı), sonra `npm run deploy`. `www` → ana adres yönlendirmesi ve e-posta (`merhaba@nodiwears.com`) panelden kurulur; adımlar için `docs/domain-and-seo.md`.
 
 Yayın öncesi `src/data/site.ts` içindeki e-posta, telefon ve adresi gerçek değerlerle değiştirin.

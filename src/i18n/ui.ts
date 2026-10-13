@@ -2,8 +2,9 @@ import type { Localized } from './config';
 
 const tr = {
   meta: {
-    tagline: 'Nakış tasarımları',
-    description: 'nodiwears: kendi nakış tasarımlarımız ve isteğe özel tasarımlar.',
+    tagline: 'Özgün nakış tasarımları ve özel nakış işleme',
+    description:
+      'nodiwears; mitoloji, bitkiler ve hayvanlar gibi koleksiyonlarda kendi nakış tasarımlarını sunar ve size özel nakış tasarımı yapar.',
   },
   nav: {
     catalog: 'Katalog',
@@ -56,7 +57,10 @@ const tr = {
     back: '← Katalog',
     previewSoon: 'Görsel yakında',
     previewAlt: '{title} tasarımı için görsel yakında',
-    description: '{collection}: {title} nakış tasarımı.',
+    seoTitle: '{title} nakış tasarımı | {name}',
+    description:
+      '{title}: nodiwears kataloğundaki {collection} koleksiyonundan özgün nakış tasarımı. Giyim ürünlerinize işletmek için bize yazın.',
+    more: 'Bu koleksiyondan diğerleri',
     inquiry: 'Merhaba, {collection} koleksiyonundan "{design}" tasarımıyla ilgileniyorum.',
   },
   policy: {
@@ -77,8 +81,9 @@ const tr = {
 
 const en: typeof tr = {
   meta: {
-    tagline: 'Embroidery designs',
-    description: 'nodiwears: our own embroidery designs and custom designs made just for you.',
+    tagline: 'Original embroidery designs and custom embroidery',
+    description:
+      'nodiwears offers its own embroidery designs in collections like mythology, plants and animals, and creates custom embroidery designs just for you.',
   },
   nav: {
     catalog: 'Catalog',
@@ -131,7 +136,10 @@ const en: typeof tr = {
     back: '← Catalog',
     previewSoon: 'Image coming soon',
     previewAlt: 'Image coming soon for the {title} design',
-    description: '{collection}: {title} embroidery design.',
+    seoTitle: '{title} embroidery design | {name}',
+    description:
+      '{title}: an original embroidery design from the {collection} collection in the nodiwears catalog. Write to us to have it stitched on your clothing.',
+    more: 'More from this collection',
     inquiry: 'Hello, I am interested in the "{design}" design from the {collection} collection.',
   },
   policy: {

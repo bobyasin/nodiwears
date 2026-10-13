@@ -2,11 +2,12 @@
 import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
-import { siteConfig } from '../data/site';
+import { getRelatedDesigns, siteConfig } from '../data/site';
 import { getOtherLocale, type Locale } from '../i18n/config';
-import { getDesignPath, getSectionPath } from '../i18n/paths';
+import { getDesignPath, getHomePath, getSectionPath } from '../i18n/paths';
 import { ui } from '../i18n/ui';
 import { formatMessage } from '../lib/format';
+import { buildBreadcrumbSchema } from '../lib/structured-data';
 import Layout from '../layouts/Layout.astro';
 
 interface Props {
@@ -20,13 +21,23 @@ const { locale, id, title, collection } = Astro.props;
 const t = ui[locale].design;
 const alternatePath = getDesignPath(getOtherLocale(locale), id);
 const inquiry = formatMessage(t.inquiry, { collection, design: title });
+const related = getRelatedDesigns(locale, id);
+const absolute = (path: string) => new URL(path, siteConfig.url).href;
+const structuredData = [
+	buildBreadcrumbSchema([
+		{ name: siteConfig.name, url: absolute(getHomePath(locale)) },
+		{ name: ui[locale].catalog.title, url: absolute(getSectionPath(locale, 'katalog')) },
+		{ name: title, url: absolute(getDesignPath(locale, id)) },
+	]),
+];
 ---
 
 <Layout
 	locale={locale}
-	title={`${title} | ${siteConfig.name}`}
+	title={formatMessage(t.seoTitle, { title, name: siteConfig.name })}
 	description={formatMessage(t.description, { collection, title })}
 	alternatePath={alternatePath}
+	structuredData={structuredData}
 >
 	<Header locale={locale} alternatePath={alternatePath} />
 	<main>
@@ -36,6 +47,21 @@ const inquiry = formatMessage(t.inquiry, { collection, design: title });
 				<p class="collection">{collection}</p>
 				<h1>{title}</h1>
 				<div class="preview" role="img" aria-label={formatMessage(t.previewAlt, { title })}>{t.previewSoon}</div>
+
+				{
+					related.length > 0 && (
+						<nav class="related" aria-labelledby="related-heading">
+							<h2 id="related-heading">{t.more}</h2>
+							<ul>
+								{related.map((design) => (
+									<li>
+										<a href={getDesignPath(locale, design.node.id)}>{design.title}</a>
+									</li>
+								))}
+							</ul>
+						</nav>
+					)
+				}
 			</div>
 		</section>
 		<Contact locale={locale} defaultMessage={inquiry} />
@@ -82,5 +108,38 @@ const inquiry = formatMessage(t.inquiry, { collection, design: title });
 		font-family: var(--font-display);
 		font-size: 1.4rem;
 		font-weight: 800;
+	}
+
+	.related {
+		margin-top: 2.5rem;
+	}
+
+	.related h2 {
+		font-size: 1.3rem;
+	}
+
+	.related ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.related a {
+		display: block;
+		padding: 0.45rem 1.1rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 600;
+		text-decoration: none;
+		transition: transform 0.15s, background 0.15s;
+	}
+
+	.related a:hover {
+		background: var(--color-sun);
+		transform: translateY(-3px) rotate(-3deg);
 	}
 </style>

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { locales } from '../i18n/config';
-import { catalogTree, collectDesigns, flattenCatalog, siteConfig } from './site';
+import { catalogTree, collectDesigns, flattenCatalog, getRelatedDesigns, siteConfig } from './site';
 
 describe('catalog tree', () => {
   const nodes = flattenCatalog(catalogTree);
@@ -94,6 +94,31 @@ describe('designs', () => {
     for (const design of collectDesigns(catalogTree, 'tr')) {
       expect(design.node.id).toMatch(/^[a-z0-9-]+$/);
     }
+  });
+});
+
+describe('related designs', () => {
+  it('should list other designs of the same collection only', () => {
+    const related = getRelatedDesigns('tr', 'mitoloji-medusa');
+
+    expect(related.length).toBeGreaterThan(0);
+
+    for (const design of related) {
+      expect(design.rootId).toBe('mitoloji');
+      expect(design.node.id).not.toBe('mitoloji-medusa');
+    }
+  });
+
+  it('should respect the limit', () => {
+    expect(getRelatedDesigns('en', 'bitkiler-lale', 2)).toHaveLength(2);
+  });
+
+  it('should localize the titles of related designs', () => {
+    expect(getRelatedDesigns('en', 'mitoloji-medusa').map((design) => design.title)).toContain('Phoenix');
+  });
+
+  it('should return nothing for an unknown design', () => {
+    expect(getRelatedDesigns('tr', 'yok')).toEqual([]);
   });
 });
 

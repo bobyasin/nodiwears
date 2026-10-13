@@ -69,6 +69,17 @@ export function flattenCatalog(nodes: readonly CatalogNode[]): CatalogNode[] {
   return nodes.flatMap((node) => [node, ...flattenCatalog(node.children ?? [])]);
 }
 
+export function getRelatedDesigns(locale: Locale, id: string, limit = 5): CatalogDesign[] {
+  const designs = collectDesigns(catalogTree, locale);
+  const current = designs.find((design) => design.node.id === id);
+
+  if (!current) {
+    return [];
+  }
+
+  return designs.filter((design) => design.rootId === current.rootId && design.node.id !== id).slice(0, limit);
+}
+
 export function collectDesigns(
   nodes: readonly CatalogNode[],
   locale: Locale,
