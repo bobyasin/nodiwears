@@ -1,0 +1,86 @@
+---
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { siteConfig } from '../data/site';
+import { getOtherLocale, type Locale } from '../i18n/config';
+import { getDesignPath, getSectionPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import { formatMessage } from '../lib/format';
+import Layout from '../layouts/Layout.astro';
+
+interface Props {
+	locale: Locale;
+	id: string;
+	title: string;
+	collection: string;
+}
+
+const { locale, id, title, collection } = Astro.props;
+const t = ui[locale].design;
+const alternatePath = getDesignPath(getOtherLocale(locale), id);
+const inquiry = formatMessage(t.inquiry, { collection, design: title });
+---
+
+<Layout
+	locale={locale}
+	title={`${title} | ${siteConfig.name}`}
+	description={formatMessage(t.description, { collection, title })}
+	alternatePath={alternatePath}
+>
+	<Header locale={locale} alternatePath={alternatePath} />
+	<main>
+		<section class="section design">
+			<div class="container">
+				<a class="back" href={getSectionPath(locale, 'katalog')}>{t.back}</a>
+				<p class="collection">{collection}</p>
+				<h1>{title}</h1>
+				<div class="preview" role="img" aria-label={formatMessage(t.previewAlt, { title })}>{t.previewSoon}</div>
+			</div>
+		</section>
+		<Contact locale={locale} defaultMessage={inquiry} />
+	</main>
+	<Footer locale={locale} />
+</Layout>
+
+<style>
+	.back {
+		display: inline-block;
+		padding: 0.35rem 1rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.back:hover {
+		background: var(--color-sun);
+	}
+
+	.collection {
+		margin: 1.5rem 0 0.25rem;
+		color: var(--color-ink-soft);
+		font-weight: 600;
+	}
+
+	h1 {
+		font-size: clamp(2.8rem, 9vw, 5.5rem);
+	}
+
+	.preview {
+		display: grid;
+		place-items: center;
+		max-width: 520px;
+		aspect-ratio: 4 / 3;
+		margin-top: 1.5rem;
+		border: 3px solid var(--color-ink);
+		border-radius: var(--radius);
+		background: var(--color-lilac);
+		box-shadow: var(--shadow);
+		font-family: var(--font-display);
+		font-size: 1.4rem;
+		font-weight: 800;
+	}
+</style>

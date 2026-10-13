@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cloudflare'de Yayın - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Cloudflare'de Yayın</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Siteyi Cloudflare üzerinde hızlı, güvenli ve düşük maliyetle yayınlamak. Site tamamen statik olduğu için ek sunucu gerekmez.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Site tek komutla veya koda her değişiklik gönderildiğinde otomatik olarak yayınlanabilir.</li>
+  <li>Sayfalar Cloudflare'in dünya genelindeki sunucularından, güvenli (HTTPS) bağlantıyla sunulur.</li>
+  <li>Var olmayan bir adres açıldığında "Sayfa bulunamadı / Page not found" sayfası görünür; ziyaretçi ana sayfaya (TR veya EN) dönebilir.</li>
+  <li>Tarayıcıya güvenlik talimatları gönderilir: site başka sitelerin içinde gösterilemez, dışarıdan script yüklenemez vb.</li>
+  <li>Görsel ve stil dosyaları tarayıcıda uzun süre saklanır, böylece tekrar ziyaretlerde site daha hızlı açılır.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Siteye yeni bir dış hizmet (ör. analiz aracı, harita, dış yazı tipi) eklenirse güvenlik kuralı da birlikte güncellenmelidir; aksi halde tarayıcı onu engeller.</li>
+  <li>Gizli bilgiler (şifre, anahtar) kod deposuna konmaz.</li>
+</ul>
+
+<h2>Hata durumları ve sınır durumlar</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>Olmayan adres</td><td>404 sayfası ve "bulunamadı" durumu döner.</td></tr>
+  <tr><td>Adres sonunda "/" olmadan açılan sayfa (ör. /en)</td><td>Otomatik olarak doğru adrese (/en/) yönlenir.</td></tr>
+  <tr><td>Dışarıdan bir kaynak engellenirse</td><td>Tarayıcı konsolunda güvenlik uyarısı çıkar; kural güncellenmelidir.</td></tr>
+</table>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Yayın adresinde ana sayfa ve /en/ sayfasını aç</td><td>İkisi de açılır, görünüm yerel sürümle aynıdır.</td></tr>
+  <tr><td>2</td><td>Var olmayan bir adres aç (ör. /yok-boyle-sayfa)</td><td>"Sayfa bulunamadı / Page not found" sayfası görünür.</td></tr>
+  <tr><td>3</td><td>Tarayıcı geliştirici araçlarında sayfa yanıt başlıklarına bak</td><td>Güvenlik başlıkları (CSP, X-Frame-Options, HSTS) görünür.</td></tr>
+  <tr><td>4</td><td>Tarayıcı konsoluna bak</td><td>Güvenlik (CSP) hatası yoktur.</td></tr>
+  <tr><td>5</td><td>Çerez bildirimi, katalog filtresi, dil değiştirici ve form</td><td>Yayında da çalışır.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Tüm QA senaryoları yayın adresinde geçer.</li>
+  <li>Alan adı bağlandıktan sonra "www" adresi ana adrese yönlenir (panelden ayarlanır).</li>
+</ul>
+
+<h2>Yayın nasıl yapılır</h2>
+<ul>
+  <li><strong>Otomatik (önerilen):</strong> Cloudflare panelinde projeyi kod deposundan bağlayın; her değişiklikte site kendiliğinden yayınlanır.</li>
+  <li><strong>Elle:</strong> Geliştirici bilgisayarında giriş yapıp yayın komutunu çalıştırır.</li>
+</ul>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+  <li>Alan adı, www yönlendirmesi ve hesap ayarları Cloudflare panelinden yapılır.</li>
+  <li>Alan adı belli olmadan arama motorları için site haritası ve dil bağlantıları eklenemez.</li>
+  <li>Güvenlik kuralı, sayfaya gömülü küçük script'ler nedeniyle tam sıkılıkta değildir.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-13</td><td>İlk sürüm: Cloudflare yayın yapılandırması, güvenlik başlıkları, 404 sayfası.</td></tr>
+  <tr><td>2026-10-13</td><td>Özel alan adı nodiwears.com yapılandırmaya eklendi (bkz. alan adı ve arama görünürlüğü dokümanı).</td></tr>
+</table>
+</body>
+</html>

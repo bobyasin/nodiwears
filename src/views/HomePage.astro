@@ -1,0 +1,29 @@
+---
+import Catalog from '../components/Catalog.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Marquee from '../components/Marquee.astro';
+import { getOtherLocale, type Locale } from '../i18n/config';
+import { getHomePath } from '../i18n/paths';
+import Layout from '../layouts/Layout.astro';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const alternatePath = getHomePath(getOtherLocale(locale));
+---
+
+<Layout locale={locale} alternatePath={alternatePath}>
+	<Header locale={locale} alternatePath={alternatePath} />
+	<main>
+		<Hero locale={locale} />
+		<Marquee locale={locale} />
+		<Catalog locale={locale} />
+		<Contact locale={locale} />
+	</main>
+	<Footer locale={locale} />
+</Layout>

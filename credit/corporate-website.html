@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>nodiwears Web Sitesi - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #1b2433; }
+  h1, h2 { font-family: Georgia, serif; }
+  h2 { margin-top: 2rem; border-bottom: 2px dashed #e6dccb; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #e6dccb; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #faf6ef; }
+</style>
+</head>
+<body>
+<h1>nodiwears Web Sitesi</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>nodiwears'ın kendi nakış tasarımlarını ve özel tasarım hizmetini tanıtmak; ziyaretçilerin beğendikleri desen için kolayca talep oluşturmasını sağlamak. nodiwears müşteri logosu veya markası basmaz.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Genç, renkli ve minimalist tasarım: büyük başlıklar, pastel renkler, kalın çerçeveli kartlar. Siyah kullanılmaz.</li>
+  <li>Ana sayfada logo daire çıkartma olarak görünür; fareyle gezdirince hafifçe hareket eder. Altında koleksiyon adları kayan şerit olarak akar.</li>
+  <li>Minimalist Türkçe site: ana sayfada Giriş, Katalog ve İletişim; her desen için ayrı bir sayfa.</li>
+  <li>Katalogda tüm desenler renkli kartlar halinde tek ızgarada görünür. Üstteki filtre düğmeleriyle (Tümü, Mitoloji, Bitkiler, Hayvanlar) yalnızca seçilen koleksiyonun desenleri gösterilir.</li>
+  <li>Bir desene tıklayınca o desenin kendi sayfası açılır: koleksiyon adı, desen adı ve seçilen desenle hazır doldurulmuş iletişim formu görünür. "← Katalog" bağlantısı ana sayfadaki kataloğa döndürür.</li>
+  <li>Form gönderilince ziyaretçinin e-posta uygulaması konu ve mesajla açılır.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Ad, e-posta ve mesaj zorunludur; e-posta geçerli biçimde olmalıdır.</li>
+  <li>Ad en fazla 100, mesaj en fazla 2000 karakter olabilir.</li>
+</ul>
+
+<h2>Hata durumları</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>Boş veya hatalı alan</td><td>Formun altında ne düzeltileceği yazar; e-posta uygulaması açılmaz.</td></tr>
+  <tr><td>E-posta uygulaması yok</td><td>Hiçbir şey açılmaz; sayfadaki e-posta adresi elle kullanılabilir.</td></tr>
+</table>
+
+<h2>Sınır durumlar</h2>
+<ul>
+  <li>İsme satır sonu eklenerek e-postaya gizli başlık sokulmaya çalışılırsa temizlenir.</li>
+  <li>Tarayıcıda JavaScript kapalıysa form çalışmaz; tüm desenler görünür ve desen sayfaları çalışır, yalnızca filtre çalışmaz; iletişim bilgileri görünür kalır.</li>
+  <li>Türkçe karakterli desen adları adreste sade harflerle yazılır (ör. "Anka kuşu" için anka-kusu).</li>
+</ul>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Siteyi aç</td><td>"iğne iğne işlenir." başlığı, logo çıkartması ve iki düğme görünür; sekmede marka ikonu çıkar. Fareyle gezinince şekiller hafifçe kayar; kayan şerit üzerine gelince durur.</td></tr>
+  <tr><td>2</td><td>Katalogda "Bitkiler" filtresine bas</td><td>Yalnızca bitki desenleri kalır; "Tümü" hepsini geri getirir.</td></tr>
+  <tr><td>3</td><td>Bir desene (ör. Medusa) tıkla</td><td>Desenin kendi sayfası açılır; koleksiyon ve desen adı görünür, mesaj alanı seçilen desenle hazır dolu gelir.</td></tr>
+  <tr><td>3a</td><td>Desen sayfasında "← Katalog" bağlantısına tıkla</td><td>Ana sayfadaki katalog bölümüne dönülür.</td></tr>
+  <tr><td>4</td><td>Formu boş gönder</td><td>Üç hata mesajı çıkar, e-posta açılmaz.</td></tr>
+  <tr><td>5</td><td>Formu geçerli bilgilerle gönder</td><td>E-posta uygulaması konu ve gövde dolu açılır.</td></tr>
+  <tr><td>6</td><td>Telefon genişliğinde menü düğmesine bas</td><td>Menü açılır; bağlantıya tıklayınca kapanır.</td></tr>
+  <tr><td>7</td><td>Klavyeyle (Tab) gez</td><td>Odaktaki öğe belirgindir; filtre düğmeleri Enter ile çalışır.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Tüm QA senaryoları geçer.</li>
+  <li>Sayfa telefonda ve bilgisayarda yatay kaydırma olmadan okunur.</li>
+  <li>Yayın öncesi iletişim bilgileri ve katalog içeriği gerçek bilgilerle güncellenmiştir.</li>
+</ul>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+  <li>İletişim bilgileri ve desen adları örnektir.</li>
+  <li>Desen sayfalarında görsel yerine "Görsel yakında" yazar; form, ziyaretçinin e-posta uygulamasına ihtiyaç duyar.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-13</td><td>İlk sürüm, marka logosu ve ikonu, doğru iş modeli anlatımı.</td></tr>
+  <tr><td>2026-10-13</td><td>Minimalist sadeleştirme: katalog ağaç menü oldu; Hizmetler, Süreç ve Neden bölümleri kaldırıldı.</td></tr>
+  <tr><td>2026-10-13</td><td>Ana sayfa yeniden tasarlandı: genç ve minimalist stil, logo çıkartma olarak, kayan şerit, renkli katalog kartları; koyu renkli öğeler kaldırıldı.</td></tr>
+  <tr><td>2026-10-13</td><td>Site Türkçe ve İngilizce yapıldı (bkz. dil desteği dokümanı).</td></tr>
+  <tr><td>2026-10-13</td><td>Katalog yapısı değişti: ağaç menü yerine filtreli renkli kart ızgarası.</td></tr>
+  <tr><td>2026-10-13</td><td>Kayan sarı şerit sonsuz döngü yapıldı; boş kısım kalmaz. Politika ve çerez bildirimi ayrı dokümanda anlatılır (legal-policies).</td></tr>
+  <tr><td>2026-10-13</td><td>Her desen kendi sayfasını açar ve iletişim formu o desenle hazır gelir.</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,12 @@
+---
+import { getPolicyStaticPaths } from '../../../i18n/static-paths';
+import PolicyPage from '../../../views/PolicyPage.astro';
+
+export function getStaticPaths() {
+	return getPolicyStaticPaths('en');
+}
+
+const { policy } = Astro.props;
+---
+
+<PolicyPage locale="en" policy={policy} />

@@ -1,0 +1,12 @@
+---
+import { getDesignStaticPaths } from '../../i18n/static-paths';
+import DesignPage from '../../views/DesignPage.astro';
+
+export function getStaticPaths() {
+	return getDesignStaticPaths('tr');
+}
+
+const { id, title, collection } = Astro.props;
+---
+
+<DesignPage locale="tr" id={id} title={title} collection={collection} />

@@ -9,9 +9,16 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "vitest run",
+    "deploy": "astro build && wrangler deploy",
+    "cf:dev": "astro build && wrangler dev"
   },
   "dependencies": {
     "astro": "^7.3.8"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.4",
+    "wrangler": "^4.150.0"
   }
 }

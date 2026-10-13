@@ -1,0 +1,251 @@
+---
+import { siteConfig } from '../data/site';
+import { locales, type Locale } from '../i18n/config';
+import { getHomePath, getSectionPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+	alternatePath: string;
+}
+
+const { locale, alternatePath } = Astro.props;
+const t = ui[locale];
+const links = [
+	{ label: t.nav.catalog, href: getSectionPath(locale, 'katalog') },
+	{ label: t.nav.contact, href: getSectionPath(locale, 'iletisim') },
+];
+const switcher = locales.map((code) => ({
+	code,
+	label: code.toUpperCase(),
+	name: t.language[code],
+	href: code === locale ? undefined : alternatePath,
+}));
+---
+
+<header class="site-header">
+	<div class="container bar">
+		<a class="brand" href={getHomePath(locale)} aria-label={t.nav.homeLabel}>
+			<span class="dot" aria-hidden="true"></span>
+			<span>{siteConfig.name}</span>
+		</a>
+
+		<nav id="main-nav" class="nav" aria-label={t.nav.mainMenuLabel}>
+			<ul>
+				{links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+			</ul>
+			<a class="button nav-cta" href={getSectionPath(locale, 'iletisim')}>{t.nav.order}</a>
+		</nav>
+
+		<div class="lang" role="group" aria-label={t.language.groupLabel}>
+			{
+				switcher.map((item) =>
+					item.href ? (
+						<a href={item.href} lang={item.code} hreflang={item.code} aria-label={item.name}>
+							{item.label}
+						</a>
+					) : (
+						<span aria-current="true" aria-label={item.name}>
+							{item.label}
+						</span>
+					),
+				)
+			}
+		</div>
+
+		<button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav">
+			<span class="visually-hidden">{t.nav.menuToggle}</span>
+			<span class="menu-icon" aria-hidden="true"></span>
+		</button>
+	</div>
+</header>
+
+<script>
+	const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+	const nav = document.querySelector<HTMLElement>('#main-nav');
+
+	function setMenu(open: boolean) {
+		toggle?.setAttribute('aria-expanded', String(open));
+		nav?.classList.toggle('is-open', open);
+	}
+
+	toggle?.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
+	nav?.addEventListener('click', (event) => {
+		if (event.target instanceof HTMLAnchorElement) {
+			setMenu(false);
+		}
+	});
+</script>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: 0.75rem;
+		z-index: 10;
+		margin-top: 0.75rem;
+	}
+
+	.bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 60px;
+		padding: 0.4rem 0.6rem 0.4rem 1.25rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+	}
+
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--font-display);
+		font-size: 1.35rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		text-decoration: none;
+	}
+
+	.dot {
+		width: 0.9rem;
+		height: 0.9rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 50%;
+		background: var(--color-thread);
+		transition: transform 0.3s;
+	}
+
+	.brand:hover .dot {
+		transform: scale(1.5) rotate(90deg);
+		background: var(--color-sun);
+	}
+
+	.nav {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-left: auto;
+	}
+
+	.lang {
+		display: flex;
+		gap: 0.25rem;
+		margin-left: 0.75rem;
+		padding: 0.2rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+	}
+
+	.lang a,
+	.lang span {
+		padding: 0.2rem 0.65rem;
+		border-radius: 999px;
+		font-size: 0.85rem;
+		font-weight: 800;
+		text-decoration: none;
+	}
+
+	.lang a:hover {
+		background: var(--color-lilac);
+	}
+
+	.lang span {
+		background: var(--color-sun);
+	}
+
+	.nav ul {
+		display: flex;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.nav ul a {
+		display: block;
+		padding: 0.45rem 0.9rem;
+		border-radius: 999px;
+		font-weight: 600;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.nav ul a:hover {
+		background: var(--color-lilac);
+	}
+
+	.nav-cta {
+		padding: 0.5rem 1.2rem;
+		box-shadow: none;
+	}
+
+	.menu-toggle {
+		display: none;
+		width: 44px;
+		height: 44px;
+		border: 0;
+		border-radius: 50%;
+		background: var(--color-sun);
+		cursor: pointer;
+	}
+
+	.menu-icon,
+	.menu-icon::before,
+	.menu-icon::after {
+		display: block;
+		width: 20px;
+		height: 2px;
+		margin-inline: auto;
+		background: var(--color-ink);
+		content: '';
+	}
+
+	.menu-icon::before {
+		transform: translateY(-6px);
+	}
+
+	.menu-icon::after {
+		transform: translateY(4px);
+	}
+
+	@media (max-width: 760px) {
+		.menu-toggle {
+			display: block;
+			margin-left: 0.5rem;
+		}
+
+		.lang {
+			margin-left: auto;
+		}
+
+		.nav {
+			display: none;
+			position: absolute;
+			top: calc(100% + 0.6rem);
+			left: 0;
+			right: 0;
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0.75rem;
+			padding: 1rem;
+			border: 2px solid var(--color-ink);
+			border-radius: var(--radius);
+			background: var(--color-paper);
+			box-shadow: var(--shadow);
+		}
+
+		.nav.is-open {
+			display: flex;
+		}
+
+		.nav ul {
+			flex-direction: column;
+		}
+
+		.nav-cta {
+			text-align: center;
+		}
+	}
+</style>

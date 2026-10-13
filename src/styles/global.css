@@ -1,0 +1,134 @@
+:root {
+  --color-cream: #fff8ee;
+  --color-paper: #ffffff;
+  --color-ink: #2d1f4d;
+  --color-ink-soft: #5b4d7a;
+  --color-thread: #e5401c;
+  --color-thread-dark: #c2330f;
+  --color-sun: #ffd84d;
+  --color-lilac: #cdb8ff;
+  --color-mint: #b9f0d4;
+  --color-pink: #ffb3d1;
+  --color-line: #eadcc6;
+  --font-display: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius: 20px;
+  --container: 1120px;
+  --shadow: 4px 4px 0 var(--color-ink);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 0.5em;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--color-sun);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-thread);
+  outline-offset: 3px;
+}
+
+.container {
+  width: min(100% - 2.5rem, var(--container));
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: clamp(3.5rem, 8vw, 6rem);
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+}
+
+.section-lead {
+  max-width: 40ch;
+  color: var(--color-ink-soft);
+  font-size: 1.25rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-sun);
+  box-shadow: var(--shadow);
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.button:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+.button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 0 var(--color-ink);
+}
+
+.button--ghost {
+  background: var(--color-paper);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

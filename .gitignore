@@ -20,3 +20,8 @@ pnpm-debug.log*
 
 # macOS
 .DS_Store
+
+# Cloudflare / Wrangler
+.wrangler/
+.dev.vars
+.dev.vars.*

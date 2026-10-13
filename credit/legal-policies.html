@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Politikalar ve Çerez Bildirimi - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Politikalar ve Çerez Bildirimi</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Ziyaretçilere kişisel verilerinin nasıl ele alındığını göstermek: KVKK Aydınlatma Metni, Gizlilik Politikası ve Çerez Politikası sitede herkesin görebileceği sayfalardır. Ayrıca ilk ziyarette çerez kullanımı hakkında kısa bir bildirim gösterilir.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Sitenin altındaki bölümde üç politikaya bağlantı bulunur; her biri kendi sayfasında açılır.</li>
+  <li>İlk ziyarette ekranın alt köşesinde "Bu site yalnızca zorunlu kayıt kullanır; takip veya reklam çerezi yok" bildirimi çıkar. "Tamam" ile kapanır ve aynı tarayıcıda tekrar çıkmaz.</li>
+  <li>İletişim formunun altında, verilerin talebi yanıtlamak için kullanıldığını söyleyen ve KVKK metnine giden kısa bir not vardır.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Sitede reklam, takip veya analiz çerezi kullanılmaz. Kullanılırsa önce ziyaretçiden açık izin alınmalı ve politikalar güncellenmelidir.</li>
+  <li>Çerez politikasındaki tablo, sitenin gerçekte sakladığı tek kaydı gösterir.</li>
+  <li>Politikalar değiştiğinde sayfadaki "Son güncelleme" tarihi de güncellenir.</li>
+</ul>
+
+<h2>Hata durumları ve sınır durumlar</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>Tarayıcı kayıt tutmaya izin vermiyor (ör. gizli mod)</td><td>Hata görünmez; bildirim her ziyarette tekrar çıkar.</td></tr>
+  <tr><td>JavaScript kapalı</td><td>Bildirim görünmez; politikalara alt bölümden yine ulaşılır.</td></tr>
+  <tr><td>Ziyaretçi tarayıcı verilerini siler</td><td>Bildirim yeniden gösterilir.</td></tr>
+</table>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Yeni tarayıcıda siteyi aç</td><td>Alt köşede çerez bildirimi görünür.</td></tr>
+  <tr><td>2</td><td>"Tamam"a bas, sayfayı yenile</td><td>Bildirim kapanır ve tekrar çıkmaz.</td></tr>
+  <tr><td>3</td><td>Bildirimdeki "Çerez politikası"na tıkla</td><td>Çerez Politikası sayfası açılır.</td></tr>
+  <tr><td>4</td><td>Alt bölümden üç politikaya git</td><td>Her sayfada başlık, güncelleme tarihi ve içerik görünür.</td></tr>
+  <tr><td>5</td><td>Çerez Politikası tablosuna bak</td><td>"nodiwears-cookie-consent" kaydı listelenmiştir.</td></tr>
+  <tr><td>6</td><td>İletişim formunun altına bak</td><td>KVKK Aydınlatma Metni'ne bağlantılı not görünür.</td></tr>
+  <tr><td>7</td><td>Telefon genişliğinde sayfaları aç</td><td>Bildirim ve tablo ekrana sığar.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Tüm QA senaryoları geçer.</li>
+  <li>Metinler sitenin gerçek davranışıyla çelişmez.</li>
+  <li>Yayın öncesi firma unvanı, adres, telefon ve e-posta gerçek bilgilerle doldurulmuş ve metinler bir hukukçu tarafından incelenmiştir.</li>
+</ul>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+  <li>Metinler genel şablondur, hukuki danışmanlık yerine geçmez.</li>
+  <li>Firma bilgileri şu an yer tutucudur.</li>
+  <li>Çerez tercih paneli yoktur; çünkü isteğe bağlı çerez kullanılmıyor.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-13</td><td>İlk sürüm: üç politika sayfası, çerez bildirimi, alt bölüm ve form bağlantıları.</td></tr>
+  <tr><td>2026-10-13</td><td>Politikalar ve çerez bildirimi Türkçe ve İngilizce yapıldı (bkz. dil desteği dokümanı).</td></tr>
+</table>
+</body>
+</html>

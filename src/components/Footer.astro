@@ -1,0 +1,82 @@
+---
+import { getPolicies } from '../data/policies';
+import { siteConfig } from '../data/site';
+import type { Locale } from '../i18n/config';
+import { getPolicyPath, getSectionPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import { formatMessage } from '../lib/format';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale];
+const links = [
+	{ label: t.nav.catalog, href: getSectionPath(locale, 'katalog') },
+	{ label: t.nav.contact, href: getSectionPath(locale, 'iletisim') },
+];
+const rights = formatMessage(t.footer.rights, { year: new Date().getFullYear(), name: siteConfig.name });
+---
+
+<footer class="footer">
+	<div class="container bar">
+		<p class="copy">{rights}</p>
+		<ul>
+			{links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+		</ul>
+		<ul class="policies" aria-label={t.footer.policiesLabel}>
+			{getPolicies(locale).map((policy) => <li><a href={getPolicyPath(locale, policy.slug)}>{policy.title}</a></li>)}
+		</ul>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		padding-block: 2rem;
+		font-size: 0.95rem;
+	}
+
+	.bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding-top: 1.5rem;
+		border-top: 3px solid var(--color-ink);
+	}
+
+	.copy {
+		margin: 0;
+		color: var(--color-ink-soft);
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.policies {
+		flex-basis: 100%;
+		font-size: 0.88rem;
+	}
+
+	.policies a {
+		font-weight: 500;
+		text-decoration: underline;
+	}
+
+	a {
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	a:hover {
+		color: var(--color-thread);
+	}
+</style>

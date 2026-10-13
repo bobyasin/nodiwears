@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dil Desteği (TR / EN) - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Dil Desteği (Türkçe / İngilizce)</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Siteyi Türkçe ve İngilizce sunarak yabancı ziyaretçilerin de kataloğu, iletişim formunu ve politikaları anlayabilmesini sağlamak.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Site Türkçe açılır. İngilizce sürüm adresin başında "/en" ile açılır.</li>
+  <li>Üstteki menüde "TR | EN" düğmesi vardır. Hangi dildeyseniz o vurgulanır; diğerine basınca aynı sayfanın o dildeki karşılığı açılır.</li>
+  <li>Ana sayfa, her desen sayfası ve üç politika sayfası (KVKK, gizlilik, çerez) iki dildedir.</li>
+  <li>Katalogdaki koleksiyon ve desen adları da çevrilmiştir (ör. Anka kuşu ↔ Phoenix).</li>
+  <li>Form hata mesajları, çerez bildirimi ve talep e-postasının konusu da sayfanın dilindedir.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Yeni bir metin eklendiğinde Türkçesi ve İngilizcesi birlikte eklenir.</li>
+  <li>Çerez bildirimini bir dilde kapatan ziyaretçi için diğer dilde tekrar gösterilmez.</li>
+  <li>İngilizce sayfadaki bağlantılar ziyaretçiyi İngilizce sayfalarda tutar.</li>
+</ul>
+
+<h2>Hata durumları ve sınır durumlar</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>İngilizce formu hatalı gönderme</td><td>Hata mesajı İngilizce görünür; e-posta açılmaz.</td></tr>
+  <tr><td>Çok uzun İngilizce kelime (ör. Chrysanthemum)</td><td>Kart içinde bölünür, taşmaz.</td></tr>
+  <tr><td>Ziyaretçi dil seçmeden siteye gelir</td><td>Her zaman Türkçe açılır; otomatik dil tespiti yoktur.</td></tr>
+</table>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Ana sayfada "EN"e bas</td><td>İngilizce sayfa açılır; "TR" ile geri dönülür.</td></tr>
+  <tr><td>2</td><td>Bir desen sayfasında dili değiştir</td><td>Aynı desenin diğer dildeki sayfası açılır.</td></tr>
+  <tr><td>3</td><td>Bir politika sayfasında dili değiştir</td><td>Politikanın diğer dildeki karşılığı açılır.</td></tr>
+  <tr><td>4</td><td>İngilizce sayfada bağlantılara tıkla</td><td>Hepsi İngilizce sayfalara gider; alt bölüm ve çerez bildirimi İngilizcedir.</td></tr>
+  <tr><td>5</td><td>İngilizce formu boş gönder; sonra geçerli gönder</td><td>Hatalar İngilizce çıkar; e-posta konusu "Order request - ad" olur.</td></tr>
+  <tr><td>6</td><td>Telefon genişliğinde sayfayı aç</td><td>Dil düğmesi ve menü düğmesi üst çubuğa sığar.</td></tr>
+  <tr><td>7</td><td>Çerez bildirimini bir dilde kapat, dili değiştir</td><td>Bildirim tekrar çıkmaz.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Tüm QA senaryoları geçer.</li>
+  <li>İki dilde hiçbir metin eksik veya boş değildir.</li>
+  <li>İngilizce politika metinleri yayın öncesi bir hukukçu tarafından gözden geçirilmiştir.</li>
+</ul>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+  <li>Dil otomatik seçilmez ve hatırlanmaz.</li>
+  <li>İngilizce politika metinleri çeviridir; hukuki inceleme gerekir.</li>
+  <li>Desen adreslerinde Türkçe adlardan türeyen kısımlar kalır (ör. mitoloji-anka-kusu).</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-13</td><td>İlk sürüm: Türkçe/İngilizce dil desteği ve dil değiştirici.</td></tr>
+  <tr><td>2026-10-13</td><td>Arama motorları için dil karşılığı bağlantıları ve site haritası eklendi (bkz. alan adı dokümanı).</td></tr>
+</table>
+</body>
+</html>

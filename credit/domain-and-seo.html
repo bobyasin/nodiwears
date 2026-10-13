@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Alan Adı ve Arama Görünürlüğü - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Alan Adı ve Arama Görünürlüğü (nodiwears.com)</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Siteyi <strong>nodiwears.com</strong> adresinde yayınlamak; Google gibi arama motorlarının siteyi, Türkçe ve İngilizce sürümleriyle birlikte doğru tanımasını ve paylaşılan bağlantıların düzgün önizleme göstermesini sağlamak.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Site <strong>https://nodiwears.com</strong> adresinde açılır. "www" ile yazılan adres otomatik olarak "www"suz adrese yönlenir.</li>
+  <li>Her sayfa arama motoruna "asıl adresim bu" bilgisini verir; Türkçe ve İngilizce sayfalar birbirinin karşılığı olarak işaretlenir.</li>
+  <li>Bağlantı paylaşıldığında başlık, kısa açıklama ve logo görseli önizlemede görünür.</li>
+  <li>Sitenin tüm sayfalarını listeleyen bir site haritası (sitemap) ve arama motorlarına yol gösteren bir robots dosyası bulunur.</li>
+  <li>"Sayfa bulunamadı" sayfası arama sonuçlarında çıkmaz.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Asıl adres her zaman "www"suz adrestir.</li>
+  <li>Alan adı değişirse ayarlar birlikte güncellenmelidir (geliştirici ekip bunu testle doğrular).</li>
+</ul>
+
+<h2>Hata durumları ve sınır durumlar</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>Alan adı Cloudflare hesabında henüz aktif değil</td><td>Yayın sırasında alan adı bağlanamaz; önce alan adı Cloudflare'e eklenmelidir.</td></tr>
+  <tr><td>Site "…workers.dev" geçici adresinden açılırsa</td><td>Sayfa açılır ama arama motoruna asıl adres olarak nodiwears.com bildirilir.</td></tr>
+  <tr><td>"merhaba@nodiwears.com" için e-posta kutusu yok</td><td>İletişim formundan gelen talepler ulaşmaz; e-posta yönlendirmesi kurulmalıdır.</td></tr>
+</table>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>nodiwears.com adresini aç</td><td>Site güvenli (HTTPS) açılır.</td></tr>
+  <tr><td>2</td><td>www.nodiwears.com adresini aç</td><td>nodiwears.com'a yönlenir; sayfa yolu korunur.</td></tr>
+  <tr><td>3</td><td>nodiwears.com/en/ adresini aç</td><td>İngilizce sayfa açılır; "TR" düğmesi Türkçe karşılığına gider.</td></tr>
+  <tr><td>4</td><td>nodiwears.com/sitemap.xml ve /robots.txt adreslerini aç</td><td>Site haritası 44 adres listeler; robots dosyası site haritasını gösterir.</td></tr>
+  <tr><td>5</td><td>Bağlantıyı mesajlaşma/sosyal ağda paylaş</td><td>Başlık, açıklama ve logo görseli önizlemede görünür.</td></tr>
+  <tr><td>6</td><td>Var olmayan bir adres aç</td><td>"Sayfa bulunamadı" sayfası görünür.</td></tr>
+  <tr><td>7</td><td>İletişim formundan talep gönder</td><td>E-posta merhaba@nodiwears.com kutusuna ulaşır.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Tüm QA senaryoları canlı adreste geçer.</li>
+  <li>Google Search Console'da site haritası kabul edilir ve dil karşılıklarıyla ilgili hata görünmez.</li>
+</ul>
+
+<h2>Yayın için yapılacaklar (özet)</h2>
+<ol>
+  <li>Alan adını Cloudflare'e ekleyin ve kayıt şirketinde Cloudflare'in verdiği nameserver'ları girin.</li>
+  <li>Siteyi yayınlayın; nodiwears.com kendiliğinden bağlanır.</li>
+  <li>Cloudflare panelinde www → www'suz yönlendirme kuralını ekleyin; "Always Use HTTPS"i açın.</li>
+  <li>Google Search Console ve Bing'e alan adını doğrulatıp site haritasını gönderin.</li>
+  <li>merhaba@nodiwears.com için e-posta yönlendirmesi kurun.</li>
+</ol>
+
+<h2>Bilinen sınırlar</h2>
+<ul>
+  <li>www yönlendirmesi ve e-posta kurulumu Cloudflare panelinden yapılır.</li>
+  <li>Paylaşım görseli her sayfada aynı logodur.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-13</td><td>İlk sürüm: nodiwears.com yapılandırması, site haritası, dil karşılıkları ve paylaşım önizlemesi.</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,162 @@
+---
+import { catalogTree, collectDesigns } from '../data/site';
+import type { Locale } from '../i18n/config';
+import { getDesignPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].catalog;
+const designs = collectDesigns(catalogTree, locale);
+const COLOR_COUNT = 4;
+const colorByCollection = new Map(catalogTree.map((collection, index) => [collection.id, index % COLOR_COUNT]));
+---
+
+<section class="section" id="katalog">
+	<div class="container">
+		<h2 class="section-title">{t.title}</h2>
+
+		<div class="filters" role="group" aria-label={t.filterLabel}>
+			<button type="button" data-filter="all" aria-pressed="true">{t.all}</button>
+			{
+				catalogTree.map((collection) => (
+					<button type="button" data-filter={collection.id} aria-pressed="false">
+						{collection.title[locale]}
+					</button>
+				))
+			}
+		</div>
+
+		<ul class="grid">
+			{
+				designs.map(({ node, title, collection, rootId }) => (
+					<li data-root={rootId} data-color={colorByCollection.get(rootId)}>
+						<a class="card" href={getDesignPath(locale, node.id)}>
+							<span class="label">{collection}</span>
+							<span class="name">{title}</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</section>
+
+<script>
+	import { ALL_FILTER, matchesFilter } from '../lib/catalog-filter';
+
+	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#katalog [data-filter]'));
+	const items = Array.from(document.querySelectorAll<HTMLElement>('#katalog [data-root]'));
+
+	function applyFilter(filter: string) {
+		for (const button of buttons) {
+			button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
+		}
+
+		for (const item of items) {
+			item.hidden = !matchesFilter(filter, item.dataset.root ?? '');
+		}
+	}
+
+	for (const button of buttons) {
+		button.addEventListener('click', () => applyFilter(button.dataset.filter ?? ALL_FILTER));
+	}
+</script>
+
+<style>
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 1.75rem 0;
+	}
+
+	.filters button {
+		padding: 0.5rem 1.2rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+		transition: background 0.15s, transform 0.15s;
+	}
+
+	.filters button:hover {
+		transform: translateY(-2px) rotate(-2deg);
+	}
+
+	.filters button[aria-pressed='true'] {
+		background: var(--color-sun);
+		box-shadow: 3px 3px 0 var(--color-ink);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+		gap: 1rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.grid li[hidden] {
+		display: none;
+	}
+
+	.grid li[data-color='0'] {
+		--card: var(--color-lilac);
+	}
+
+	.grid li[data-color='1'] {
+		--card: var(--color-mint);
+	}
+
+	.grid li[data-color='2'] {
+		--card: var(--color-pink);
+	}
+
+	.grid li[data-color='3'] {
+		--card: var(--color-sun);
+	}
+
+	.card {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 1.5rem;
+		aspect-ratio: 1;
+		padding: 1rem 1.1rem;
+		border: 3px solid var(--color-ink);
+		border-radius: var(--radius);
+		background: var(--card, var(--color-paper));
+		box-shadow: var(--shadow);
+		text-decoration: none;
+		transition: transform 0.15s, box-shadow 0.15s;
+	}
+
+	.card:hover {
+		transform: translate(-2px, -2px) rotate(-1.5deg);
+		box-shadow: 7px 7px 0 var(--color-ink);
+	}
+
+	.label {
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+	}
+
+	.name {
+		font-family: var(--font-display);
+		font-size: 1.4rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		line-height: 1.05;
+		hyphens: auto;
+		overflow-wrap: anywhere;
+	}
+</style>

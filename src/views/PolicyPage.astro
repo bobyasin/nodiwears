@@ -1,0 +1,147 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { getPoliciesUpdatedAt, getPolicyById, type Policy } from '../data/policies';
+import { siteConfig } from '../data/site';
+import { getOtherLocale, type Locale } from '../i18n/config';
+import { getHomePath, getPolicyPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import { formatMessage } from '../lib/format';
+import Layout from '../layouts/Layout.astro';
+
+interface Props {
+	locale: Locale;
+	policy: Policy;
+}
+
+const { locale, policy } = Astro.props;
+const t = ui[locale].policy;
+const otherLocale = getOtherLocale(locale);
+const otherSlug = getPolicyById(otherLocale, policy.id)?.slug ?? policy.slug;
+const alternatePath = getPolicyPath(otherLocale, otherSlug);
+---
+
+<Layout
+	locale={locale}
+	title={`${policy.title} | ${siteConfig.name}`}
+	description={policy.summary}
+	alternatePath={alternatePath}
+>
+	<Header locale={locale} alternatePath={alternatePath} />
+	<main>
+		<article class="section policy">
+			<div class="container">
+				<a class="back" href={getHomePath(locale)}>{t.back}</a>
+				<h1>{policy.title}</h1>
+				<p class="updated">{formatMessage(t.updated, { date: getPoliciesUpdatedAt(locale) })}</p>
+
+				{
+					policy.sections.map((section) => (
+						<section>
+							<h2>{section.heading}</h2>
+							{section.paragraphs?.map((paragraph) => <p>{paragraph}</p>)}
+							{section.items && (
+								<ul>
+									{section.items.map((item) => (
+										<li>{item}</li>
+									))}
+								</ul>
+							)}
+							{section.table && (
+								<div class="table-wrap">
+									<table>
+										<thead>
+											<tr>
+												{section.table.head.map((cell) => (
+													<th>{cell}</th>
+												))}
+											</tr>
+										</thead>
+										<tbody>
+											{section.table.rows.map((row) => (
+												<tr>
+													{row.map((cell) => (
+														<td>{cell}</td>
+													))}
+												</tr>
+											))}
+										</tbody>
+									</table>
+								</div>
+							)}
+						</section>
+					))
+				}
+			</div>
+		</article>
+	</main>
+	<Footer locale={locale} />
+</Layout>
+
+<style>
+	.container {
+		max-width: 760px;
+	}
+
+	.back {
+		display: inline-block;
+		padding: 0.35rem 1rem;
+		border: 2px solid var(--color-ink);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.back:hover {
+		background: var(--color-sun);
+	}
+
+	h1 {
+		margin-top: 1.5rem;
+		font-size: clamp(2.2rem, 7vw, 3.8rem);
+	}
+
+	.updated {
+		color: var(--color-ink-soft);
+	}
+
+	section {
+		margin-top: 2rem;
+	}
+
+	h2 {
+		font-size: 1.4rem;
+	}
+
+	ul {
+		padding-left: 1.25rem;
+	}
+
+	li {
+		margin-bottom: 0.35rem;
+	}
+
+	.table-wrap {
+		overflow-x: auto;
+	}
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 0.95rem;
+	}
+
+	th,
+	td {
+		padding: 0.6rem 0.8rem;
+		border: 2px solid var(--color-ink);
+		text-align: left;
+		vertical-align: top;
+	}
+
+	th {
+		background: var(--color-lilac);
+	}
+</style>

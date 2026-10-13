@@ -1,0 +1,87 @@
+import type { Locale, Localized } from '../i18n/config';
+import { slugify } from '../lib/slug';
+
+export interface CatalogNode {
+  id: string;
+  title: Localized<string>;
+  children?: readonly CatalogNode[];
+}
+
+export interface CatalogDesign {
+  node: CatalogNode;
+  title: string;
+  collection: string;
+  rootId: string;
+}
+
+export const siteConfig = {
+  name: 'nodiwears',
+  url: 'https://nodiwears.com',
+  contactEmail: 'merhaba@nodiwears.com',
+  contactPhone: '+90 000 000 00 00',
+  address: { tr: 'Adres bilgisi yakında', en: 'Address coming soon' } satisfies Localized<string>,
+} as const;
+
+// Design ids are derived from the Turkish title so URLs stay stable across languages.
+const leaves = (prefix: string, designs: readonly Localized<string>[]): CatalogNode[] =>
+  designs.map((title) => ({ id: `${prefix}-${slugify(title.tr)}`, title }));
+
+export const catalogTree: readonly CatalogNode[] = [
+  {
+    id: 'mitoloji',
+    title: { tr: 'Mitoloji', en: 'Mythology' },
+    children: leaves('mitoloji', [
+      { tr: 'Medusa', en: 'Medusa' },
+      { tr: 'Pegasus', en: 'Pegasus' },
+      { tr: 'Anka kuşu', en: 'Phoenix' },
+      { tr: 'Minotor', en: 'Minotaur' },
+      { tr: 'Zeus şimşeği', en: "Zeus's lightning bolt" },
+      { tr: 'Yaşam ağacı', en: 'Tree of life' },
+    ]),
+  },
+  {
+    id: 'bitkiler',
+    title: { tr: 'Bitkiler', en: 'Plants' },
+    children: leaves('bitkiler', [
+      { tr: 'Zeytin dalı', en: 'Olive branch' },
+      { tr: 'Lavanta', en: 'Lavender' },
+      { tr: 'Kasımpatı', en: 'Chrysanthemum' },
+      { tr: 'Eğrelti otu', en: 'Fern' },
+      { tr: 'Lale', en: 'Tulip' },
+      { tr: 'Monstera', en: 'Monstera' },
+    ]),
+  },
+  {
+    id: 'hayvanlar',
+    title: { tr: 'Hayvanlar', en: 'Animals' },
+    children: leaves('hayvanlar', [
+      { tr: 'Kurt', en: 'Wolf' },
+      { tr: 'Baykuş', en: 'Owl' },
+      { tr: 'Kedi', en: 'Cat' },
+      { tr: 'Geyik', en: 'Deer' },
+      { tr: 'Kartal', en: 'Eagle' },
+      { tr: 'Tilki', en: 'Fox' },
+    ]),
+  },
+];
+
+export function flattenCatalog(nodes: readonly CatalogNode[]): CatalogNode[] {
+  return nodes.flatMap((node) => [node, ...flattenCatalog(node.children ?? [])]);
+}
+
+export function collectDesigns(
+  nodes: readonly CatalogNode[],
+  locale: Locale,
+  parents: readonly string[] = [],
+  rootId?: string,
+): CatalogDesign[] {
+  return nodes.flatMap((node) => {
+    const root = rootId ?? node.id;
+
+    if (node.children) {
+      return collectDesigns(node.children, locale, [...parents, node.title[locale]], root);
+    }
+
+    return [{ node, title: node.title[locale], collection: parents.join(' / '), rootId: root }];
+  });
+}
