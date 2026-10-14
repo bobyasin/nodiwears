@@ -35,6 +35,21 @@ describe('wrangler configuration', () => {
     expect(config.routes).toContainEqual({ pattern: host, custom_domain: true });
   });
 
+  it('should serve the www host from the same worker so it never returns a 522', () => {
+    const host = new URL(siteConfig.url).hostname;
+
+    expect(config.routes).toContainEqual({ pattern: `www.${host}`, custom_domain: true });
+  });
+
+  it('should only declare custom domains on the production domain', () => {
+    const host = new URL(siteConfig.url).hostname;
+
+    for (const route of config.routes) {
+      expect(route.custom_domain).toBe(true);
+      expect(route.pattern === host || route.pattern === `www.${host}`).toBe(true);
+    }
+  });
+
   it('should name the worker after the project', () => {
     expect(config.name).toBe('nodiwears');
   });

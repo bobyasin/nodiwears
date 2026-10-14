@@ -25,7 +25,7 @@ Proje yalnızca yerelde çalışıyordu; yayın için yapılandırma, güvenlik 
 - Her yanıtta güvenlik başlıkları vardır; `/_astro/*` dosyaları bir yıl önbelleklenir (`immutable`).
 
 ## Technical Overview
-- `wrangler.jsonc`: ad `nodiwears`, `routes` ile `nodiwears.com` özel alan adı, `assets.directory: ./dist`, `not_found_handling: 404-page`, `html_handling: auto-trailing-slash`, `compatibility_date`.
+- `wrangler.jsonc`: ad `nodiwears`, `routes` ile `nodiwears.com` ve `www.nodiwears.com` özel alan adları, `assets.directory: ./dist`, `not_found_handling: 404-page`, `html_handling: auto-trailing-slash`, `compatibility_date`.
 - `public/_headers`: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `Strict-Transport-Security` (6 ay, preload yok), CSP; `/_astro/*` için `Cache-Control`.
 - CSP: `default-src 'self'`, `script-src 'self' 'unsafe-inline'` (Astro küçük modül script'lerini sayfaya gömer), `style-src 'self' 'unsafe-inline'`, `img-src 'self' data:`, `frame-ancestors 'none'`, `object-src 'none'`, `form-action 'self'`. Üçüncü taraf kaynak yok.
 - `src/pages/404.astro`, `.node-version` (22), `package.json` komutları: `deploy` (`astro build && wrangler deploy`), `cf:dev` (yerelde Cloudflare çalışma zamanı), `wrangler` (devDependency).
@@ -82,3 +82,4 @@ Gerçek Cloudflare çalışma zamanı (`wrangler dev`) ile elle doğrulandı: ba
 | --- | --- |
 | 2026-10-13 | İlk sürüm: Cloudflare yapılandırması, güvenlik/önbellek başlıkları, 404 sayfası, deploy komutları, testler. |
 | 2026-10-13 | Özel alan adı rotası eklendi (`nodiwears.com`); ayrıntılar `domain-and-seo.md`. |
+| 2026-10-14 | `www.nodiwears.com` rotası eklendi (canlıda 522 veriyordu). |

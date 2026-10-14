@@ -2,7 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nodiwears",
   "compatibility_date": "2026-10-13",
-  "routes": [{ "pattern": "nodiwears.com", "custom_domain": true }],
+  "routes": [
+    { "pattern": "nodiwears.com", "custom_domain": true },
+    { "pattern": "www.nodiwears.com", "custom_domain": true }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
