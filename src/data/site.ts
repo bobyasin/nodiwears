@@ -16,7 +16,7 @@ export interface CatalogDesign {
 
 export const siteConfig = {
   name: 'nodiwears',
-  url: 'https://nodiwears.com',
+  url: 'https://www.nodiwears.com',
   contactEmail: 'merhaba@nodiwears.com',
   contactPhone: '+90 000 000 00 00',
   address: { tr: 'Adres bilgisi yakında', en: 'Address coming soon' } satisfies Localized<string>,

@@ -35,6 +35,6 @@ Site statiktir; `wrangler.jsonc` ile Cloudflare Workers Static Assets olarak yay
 - **Komut satırı:** `npx wrangler login`, sonra `npm run deploy`.
 - **Cloudflare Pages ile:** build komutu `npm run build`, çıktı dizini `dist`.
 - Güvenlik ve önbellek başlıkları `public/_headers` içindedir. Siteye yeni bir dış kaynak (script, font, görsel) eklerseniz buradaki CSP'yi de güncelleyin.
-- Alan adı `nodiwears.com`: `wrangler.jsonc` içinde özel alan adı olarak tanımlı. Önce alan adını Cloudflare'e ekleyip nameserver'ları değiştirin (bölge "Active" olmalı), sonra `npm run deploy`. `www.nodiwears.com` da aynı dosyada özel alan adı olarak bağlıdır (ayrıca DNS kaydı eklemeyin; çakışan eski kayıt varsa Wrangler üzerine yazmayı onaya sunar). E-posta (`merhaba@nodiwears.com`) ve isteğe bağlı www → apex yönlendirmesi panelden kurulur; adımlar için `docs/domain-and-seo.md`.
+- Ana adres `https://www.nodiwears.com`: `wrangler.jsonc` içinde özel alan adı olarak tanımlı (apex `nodiwears.com` de yönlendirme için bağlı). Önce alan adını Cloudflare'e ekleyip nameserver'ları değiştirin (bölge "Active" olmalı). `www` veya apex için elle eklenmiş DNS kaydı varsa silin (yoksa Cloudflare `100117` hatası verir), sonra `npm run deploy`. E-posta (`merhaba@nodiwears.com`) ve apex → `www` yönlendirme kuralı panelden kurulur; adımlar için `docs/domain-and-seo.md`.
 
 Yayın öncesi `src/data/site.ts` içindeki e-posta, telefon ve adresi gerçek değerlerle değiştirin.

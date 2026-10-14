@@ -29,24 +29,25 @@ describe('wrangler configuration', () => {
     expect(config.compatibility_date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
-  it('should attach the production domain as a custom domain', () => {
+  it('should attach the production host as a custom domain', () => {
     const host = new URL(siteConfig.url).hostname;
 
     expect(config.routes).toContainEqual({ pattern: host, custom_domain: true });
   });
 
-  it('should serve the www host from the same worker so it never returns a 522', () => {
-    const host = new URL(siteConfig.url).hostname;
+  it('should keep the apex domain attached so it can redirect to the production host', () => {
+    const apex = new URL(siteConfig.url).hostname.replace(/^www\./, '');
 
-    expect(config.routes).toContainEqual({ pattern: `www.${host}`, custom_domain: true });
+    expect(config.routes).toContainEqual({ pattern: apex, custom_domain: true });
   });
 
   it('should only declare custom domains on the production domain', () => {
     const host = new URL(siteConfig.url).hostname;
+    const apex = host.replace(/^www\./, '');
 
     for (const route of config.routes) {
       expect(route.custom_domain).toBe(true);
-      expect(route.pattern === host || route.pattern === `www.${host}`).toBe(true);
+      expect([host, apex]).toContain(route.pattern);
     }
   });
 
@@ -94,9 +95,9 @@ describe('build tooling', () => {
 describe('production domain', () => {
   const host = new URL(siteConfig.url).hostname;
 
-  it('should serve the site over HTTPS on the apex domain', () => {
+  it('should serve the site over HTTPS on the www host', () => {
     expect(siteConfig.url).toBe(`https://${host}`);
-    expect(host).toBe('nodiwears.com');
+    expect(host).toBe('www.nodiwears.com');
   });
 
   it('should keep the Astro site setting in sync with the site config', () => {

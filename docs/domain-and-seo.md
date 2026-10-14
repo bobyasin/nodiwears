@@ -1,17 +1,17 @@
 # Production Domain and Search Visibility (nodiwears.com)
 
 ## Business Purpose
-Siteyi `nodiwears.com` adresinde yayınlamak ve arama motorlarının/sosyal ağların siteyi, iki dil sürümüyle birlikte doğru tanımasını sağlamak.
+Siteyi `www.nodiwears.com` adresinde yayınlamak ve arama motorlarının/sosyal ağların siteyi, iki dil sürümüyle birlikte doğru tanımasını sağlamak.
 
 ## Problem Statement
 Site alan adı bilmediği için mutlak adres gerektiren özellikler (canonical, hreflang, sitemap, paylaşım görseli, özel alan adı) yoktu.
 
 ## Scope
-- Ana adres (canonical): `https://nodiwears.com` (www'suz). `www.nodiwears.com` da aynı Worker'a özel alan adı olarak bağlıdır ve siteyi doğrudan sunar (200); arama motorlarına canonical ile ana adres bildirilir.
+- Ana adres (canonical): `https://www.nodiwears.com`. Site yalnızca bu adreste sunulur; `nodiwears.com` (apex) panelden tanımlanan bir yönlendirme kuralıyla `www`'ye 301 yönlenir. Kullanıcılar `www` ile aradığı için ana adres `www`'dir.
 - `site` ayarı (`astro.config.mjs`) ve `siteConfig.url`; bunlar test ile senkron tutulur.
 - Her sayfada canonical, dil karşılığı için `hreflang` (tr, en, x-default), Open Graph (`og:url`, `og:image` ve boyutları) ve Twitter kartı.
 - `/sitemap.xml`: tüm sayfalar iki dilde, karşılıklı `hreflang` bağlantılarıyla. `/robots.txt`: tüm tarayıcılara izin + sitemap adresi.
-- `wrangler.jsonc`: `nodiwears.com` ve `www.nodiwears.com` Cloudflare özel alan adı olarak bağlanır.
+- `wrangler.jsonc`: `www.nodiwears.com` (ana adres) ve `nodiwears.com` (yönlendirme için DNS kaydı ve sertifika sağlamak üzere) Cloudflare özel alan adı olarak bağlanır.
 - 404 sayfası `noindex` alır, canonical içermez, sitemap'te yer almaz.
 - Sayfa başına anahtar kelimeli başlık ve açıklama: ana sayfa "nodiwears | Özgün nakış tasarımları ve özel nakış işleme" (EN karşılığı), desen sayfaları "<Desen> nakış tasarımı | nodiwears" ve desene özel açıklama. Başlık ≤ 62, açıklama 70–165 karakter.
 - Yapılandırılmış veri (JSON-LD): ana sayfalarda `Organization` (logo, e-posta) ve `WebSite` (dil); desen sayfalarında `BreadcrumbList` (Ana sayfa > Katalog > Desen). Telefon ve adres yer tutucu olduğu için yayınlanmaz.
@@ -19,7 +19,7 @@ Site alan adı bilmediği için mutlak adres gerektiren özellikler (canonical, 
 - Hero görseli `fetchpriority="high"` ile yüklenir (LCP).
 
 ## Out of Scope
-- Alan adının Cloudflare'e taşınması ve DNS bölgesinin aktifleştirilmesi (panel işi). `www` → apex yönlendirmesi isteğe bağlıdır (aşağıya bakın).
+- Alan adının Cloudflare'e taşınması ve DNS bölgesinin aktifleştirilmesi (panel işi). apex → `www` yönlendirme kuralı panelden tanımlanır (aşağıya bakın).
 - E-posta altyapısı (`merhaba@nodiwears.com` kutusu/yönlendirmesi).
 - Arama motoru hesapları (Search Console/Bing) ve yapılandırılmış veri (JSON-LD).
 
@@ -42,7 +42,7 @@ Derleme → sayfalar canonical/hreflang ile üretilir; `sitemap.xml` aynı yol y
 Yok.
 
 ## Business Rules
-- Canonical ana adres www'suzdur; yeni sayfa eklendiğinde `getSitemapPages` kapsamına girdiği testle doğrulanır.
+- Canonical ana adres `www.nodiwears.com`'dur; yeni sayfa eklendiğinde `getSitemapPages` kapsamına girdiği testle doğrulanır.
 - Alan adı değişirse `siteConfig.url`, `astro.config.mjs` `site`, `public/robots.txt` ve `wrangler.jsonc` birlikte güncellenir (test, uyumsuzluğu yakalar).
 
 ## Error Scenarios
@@ -51,8 +51,9 @@ Yok.
 
 ## Edge Cases
 - XML'de özel karakterler (`&`, `<`, `"`) kaçışlanır.
-- `*.workers.dev` ve `www.nodiwears.com` adresleri de açıktır; canonical her zaman `nodiwears.com`'u gösterir.
-- Çerez bildirimi tarayıcı deposunda tutulduğu için `nodiwears.com` ve `www.nodiwears.com` ayrı kabul edilir; ziyaretçi iki adreste bildirimi ayrı ayrı kapatır.
+- `*.workers.dev` adresi de açıktır; canonical her zaman `www.nodiwears.com`'u gösterir.
+- Yönlendirme kuralı tanımlanana kadar apex de siteyi sunar; canonical `www`'yi gösterdiği için arama motorları için sorun olmaz.
+- Ziyaretçi apex'e girip `www`'ye yönlendirilirse çerez bildirimi tarayıcı deposu `www` için ayrı olduğundan yeniden gösterilebilir.
 
 ## Security Considerations
 Sitemap/robots yalnızca herkese açık sayfaları içerir. Paylaşım görseli yalnızca logodur. Yeni dış kaynak yok (CSP değişmedi).
@@ -69,10 +70,10 @@ Sitemap/robots yalnızca herkese açık sayfaları içerir. Paylaşım görseli 
 Yok. Derleme çıktısı elle denetlendi (canonical, hreflang, og etiketleri, `noindex`, sitemap içeriği). Yayın sonrası canlı doğrulama için QA senaryolarına bakın.
 
 ## QA Scenarios
-1. `https://nodiwears.com/` açılır; kaynakta canonical `https://nodiwears.com/` ve `hreflang` etiketleri vardır.
-2. `https://nodiwears.com/en/` canonical'ı kendi adresidir; `hreflang="tr"` Türkçe ana sayfayı gösterir.
-3. `https://nodiwears.com/sitemap.xml` 44 adres içerir; `robots.txt` sitemap'i gösterir.
-4. `https://www.nodiwears.com/` 200 ile açılır (522/52x hatası yoktur); sayfa kaynağında canonical `https://nodiwears.com/` görünür.
+1. `https://www.nodiwears.com/` açılır; kaynakta canonical `https://www.nodiwears.com/` ve `hreflang` etiketleri vardır.
+2. `https://www.nodiwears.com/en/` canonical'ı kendi adresidir; `hreflang="tr"` Türkçe ana sayfayı gösterir.
+3. `https://www.nodiwears.com/sitemap.xml` 44 adres içerir; `robots.txt` sitemap'i gösterir.
+4. `https://nodiwears.com/...` → `https://www.nodiwears.com/...` (301, yol ve sorgu korunur). `www` 200 ile açılır (522/52x hatası yoktur).
 5. Bir bağlantı sosyal ağda/mesajlaşmada paylaşılınca başlık, açıklama ve logo görseli görünür.
 6. Var olmayan adres 404 verir ve sayfa kaynağında `noindex` vardır.
 7. Search Console'a sitemap gönderilir; hreflang hatası raporlanmaz.
@@ -85,15 +86,14 @@ Build ve testler başarılı; `wrangler deploy --dry-run` başarılı; QA senary
 
 ## Deployment / Migration Considerations
 1. Cloudflare'de "Add a domain" ile `nodiwears.com`'u ekleyin; kayıt şirketinde nameserver'ları Cloudflare'in verdiği ikiliyle değiştirin; bölge "Active" olana kadar bekleyin.
-2. `npm run deploy` çalıştırın: `routes` ayarı `nodiwears.com` için DNS kaydı ve sertifikayı kendiliğinden oluşturur.
-3. `www` için ayrıca DNS kaydı eklemeyin: `routes` ayarı `www.nodiwears.com`'u da özel alan adı olarak bağlar. Daha önce elle bir `www` DNS kaydı (ör. AAAA `100::`) eklendiyse Wrangler çakışmayı algılar; etkileşimli modda onay ister, CI'da üzerine yazar (istenirse kaydı önce silin). Kayıt çakışırken `www` 522 hatası verir.
-3a. İsteğe bağlı: `www` adresini ana adrese yönlendirmek isterseniz Rules → Redirect Rules'ta ana makine adı `www.nodiwears.com` ise `concat("https://nodiwears.com", http.request.uri.path)` adresine 301 (sorgu dizesi korunarak) kuralı ekleyin; kural Worker'dan önce çalışır.
+2. Önce panelde `www` için elle eklenmiş DNS kaydı varsa (ör. AAAA `100::`) silin; aksi halde Cloudflare özel alan adı bağlamayı reddeder (hata `100117`: "Hostname already has externally managed DNS records"). Ardından `npm run deploy` çalıştırın: `routes` ayarı `www.nodiwears.com` ve `nodiwears.com` için DNS kaydı ve sertifikayı kendiliğinden oluşturur.
+3. apex adresini `www`'ye yönlendirin: Rules → Redirect Rules'ta ana makine adı `nodiwears.com` ise `concat("https://www.nodiwears.com", http.request.uri.path)` adresine 301 (sorgu dizesi korunarak). Kural Worker'dan önce çalışır.
 4. SSL/TLS → Edge Certificates: "Always Use HTTPS" açık.
-5. Google Search Console ve Bing Webmaster'da alan adını doğrulayıp `https://nodiwears.com/sitemap.xml` gönderin.
+5. Google Search Console ve Bing Webmaster'da alan adını doğrulayıp `https://www.nodiwears.com/sitemap.xml` gönderin.
 6. E-posta: iletişim formu `merhaba@nodiwears.com`'a yazdığı için bu adres bir kutuya ulaşmalı (ör. Cloudflare Email Routing ile kişisel kutuya yönlendirme).
 
 ## Known Limitations
-- `www` → apex yönlendirmesi kod ile değil (isteğe bağlı) panelden tanımlanır; kod, `www`'yi doğrudan sunar.
+- apex → `www` yönlendirmesi kod ile değil panelden tanımlanır (her istekte Worker çalıştırmamak ve host eşleşmesi yapabilmek için). Kural tanımlanana kadar apex de siteyi sunar.
 - Sitemap'te `lastmod` yoktur; `Product`/`ImageObject` şemaları yoktur (desen görseli ve fiyat yok).
 - Ana sayfa `h1` metni ("iğne iğne işlenir.") tasarım gereği kısadır; anahtar kelimeler başlık, açıklama ve yapılandırılmış veride taşınır.
 - Paylaşım görseli logodur (1024×572); sayfa başına özel görsel yok.
@@ -104,3 +104,4 @@ Build ve testler başarılı; `wrangler deploy --dry-run` başarılı; QA senary
 | 2026-10-13 | İlk sürüm: nodiwears.com için site ayarı, canonical/hreflang/OG, sitemap, robots, özel alan adı rotası. |
 | 2026-10-13 | SEO: anahtar kelimeli başlık/açıklama, JSON-LD, ilgili desen bağlantıları, hero LCP önceliği. |
 | 2026-10-14 | `www.nodiwears.com` özel alan adı olarak eklendi (canlıda 522 veriyordu: Worker'a bağlı değildi). |
+| 2026-10-14 | Ana adres `www.nodiwears.com` yapıldı (canonical, sitemap, robots); apex panelden `www`'ye yönlendirilir. |

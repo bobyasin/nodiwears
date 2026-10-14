@@ -13,15 +13,15 @@
 </style>
 </head>
 <body>
-<h1>Alan Adı ve Arama Görünürlüğü (nodiwears.com)</h1>
+<h1>Alan Adı ve Arama Görünürlüğü (www.nodiwears.com)</h1>
 <p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
 
 <h2>Amaç</h2>
-<p>Siteyi <strong>nodiwears.com</strong> adresinde yayınlamak; Google gibi arama motorlarının siteyi, Türkçe ve İngilizce sürümleriyle birlikte doğru tanımasını ve paylaşılan bağlantıların düzgün önizleme göstermesini sağlamak.</p>
+<p>Siteyi <strong>www.nodiwears.com</strong> adresinde yayınlamak; Google gibi arama motorlarının siteyi, Türkçe ve İngilizce sürümleriyle birlikte doğru tanımasını ve paylaşılan bağlantıların düzgün önizleme göstermesini sağlamak.</p>
 
 <h2>Beklenen davranış</h2>
 <ul>
-  <li>Site <strong>https://nodiwears.com</strong> adresinde açılır. "www" ile yazılan adres (<strong>https://www.nodiwears.com</strong>) de aynı siteyi doğrudan açar; arama motorlarına asıl adres olarak "www"suz adres bildirilir.</li>
+  <li>Site <strong>https://www.nodiwears.com</strong> adresinde açılır; asıl adres budur. "www" olmadan yazılan adres (nodiwears.com) otomatik olarak "www"lu adrese yönlenir.</li>
   <li>Her sayfa arama motoruna "asıl adresim bu" bilgisini verir; Türkçe ve İngilizce sayfalar birbirinin karşılığı olarak işaretlenir.</li>
   <li>Bağlantı paylaşıldığında başlık, kısa açıklama ve logo görseli önizlemede görünür.</li>
   <li>Sitenin tüm sayfalarını listeleyen bir site haritası (sitemap) ve arama motorlarına yol gösteren bir robots dosyası bulunur.</li>
@@ -33,7 +33,7 @@
 
 <h2>İş kuralları</h2>
 <ul>
-  <li>Asıl adres (arama motorlarına bildirilen) her zaman "www"suz adrestir; "www" adresi de çalışır.</li>
+  <li>Asıl adres (arama motorlarına bildirilen) her zaman "www"lu adrestir.</li>
   <li>Alan adı değişirse ayarlar birlikte güncellenmelidir (geliştirici ekip bunu testle doğrular).</li>
 </ul>
 
@@ -42,17 +42,17 @@
   <tr><th>Durum</th><th>Ne olur</th></tr>
   <tr><td>"www" adresi 522 hatası veriyor</td><td>"www" için Worker'a bağlı özel alan adı yok veya çakışan elle eklenmiş bir DNS kaydı var; yayını yeniden yapmak (ve gerekirse çakışan kaydı silmek) çözer.</td></tr>
   <tr><td>Alan adı Cloudflare hesabında henüz aktif değil</td><td>Yayın sırasında alan adı bağlanamaz; önce alan adı Cloudflare'e eklenmelidir.</td></tr>
-  <tr><td>Site "…workers.dev" geçici adresinden açılırsa</td><td>Sayfa açılır ama arama motoruna asıl adres olarak nodiwears.com bildirilir.</td></tr>
+  <tr><td>Site "…workers.dev" geçici adresinden açılırsa</td><td>Sayfa açılır ama arama motoruna asıl adres olarak www.nodiwears.com bildirilir.</td></tr>
   <tr><td>"merhaba@nodiwears.com" için e-posta kutusu yok</td><td>İletişim formundan gelen talepler ulaşmaz; e-posta yönlendirmesi kurulmalıdır.</td></tr>
 </table>
 
 <h2>QA test senaryoları</h2>
 <table>
   <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
-  <tr><td>1</td><td>nodiwears.com adresini aç</td><td>Site güvenli (HTTPS) açılır.</td></tr>
-  <tr><td>2</td><td>www.nodiwears.com adresini aç</td><td>Site açılır (hata sayfası değil). Çerez bildirimi iki adreste ayrı ayrı gösterilir.</td></tr>
-  <tr><td>3</td><td>nodiwears.com/en/ adresini aç</td><td>İngilizce sayfa açılır; "TR" düğmesi Türkçe karşılığına gider.</td></tr>
-  <tr><td>4</td><td>nodiwears.com/sitemap.xml ve /robots.txt adreslerini aç</td><td>Site haritası 44 adres listeler; robots dosyası site haritasını gösterir.</td></tr>
+  <tr><td>1</td><td>www.nodiwears.com adresini aç</td><td>Site güvenli (HTTPS) açılır; hata sayfası değil.</td></tr>
+  <tr><td>2</td><td>nodiwears.com adresini (www olmadan) aç</td><td>www.nodiwears.com'a yönlenir; sayfa yolu korunur. Çerez bildirimi yönlendirme sonrası yeniden görünebilir.</td></tr>
+  <tr><td>3</td><td>www.nodiwears.com/en/ adresini aç</td><td>İngilizce sayfa açılır; "TR" düğmesi Türkçe karşılığına gider.</td></tr>
+  <tr><td>4</td><td>www.nodiwears.com/sitemap.xml ve /robots.txt adreslerini aç</td><td>Site haritası 44 adres listeler; robots dosyası site haritasını gösterir.</td></tr>
   <tr><td>5</td><td>Bağlantıyı mesajlaşma/sosyal ağda paylaş</td><td>Başlık, açıklama ve logo görseli önizlemede görünür.</td></tr>
   <tr><td>6</td><td>Var olmayan bir adres aç</td><td>"Sayfa bulunamadı" sayfası görünür.</td></tr>
   <tr><td>8</td><td>Bir desen sayfasının altına bak</td><td>Aynı koleksiyondaki diğer desenlere bağlantılar görünür ve çalışır.</td></tr>
@@ -69,8 +69,8 @@
 <h2>Yayın için yapılacaklar (özet)</h2>
 <ol>
   <li>Alan adını Cloudflare'e ekleyin ve kayıt şirketinde Cloudflare'in verdiği nameserver'ları girin.</li>
-  <li>Siteyi yayınlayın; nodiwears.com kendiliğinden bağlanır.</li>
-  <li>"Always Use HTTPS"i açın. İsteğe bağlı: www → www'suz yönlendirme kuralı ekleyin.</li>
+  <li>Önce panelde "www" için elle eklenmiş DNS kaydı varsa silin (aksi halde bağlama hata verir), sonra siteyi yayınlayın; www.nodiwears.com ve nodiwears.com kendiliğinden bağlanır.</li>
+  <li>"Always Use HTTPS"i açın ve nodiwears.com → www.nodiwears.com yönlendirme kuralını ekleyin.</li>
   <li>Google Search Console ve Bing'e alan adını doğrulatıp site haritasını gönderin.</li>
   <li>merhaba@nodiwears.com için e-posta yönlendirmesi kurun.</li>
 </ol>
@@ -85,7 +85,8 @@
 <table>
   <tr><th>Tarih</th><th>Değişiklik</th></tr>
   <tr><td>2026-10-13</td><td>İlk sürüm: nodiwears.com yapılandırması, site haritası, dil karşılıkları ve paylaşım önizlemesi.</td></tr>
-  <tr><td>2026-10-14</td><td>www.nodiwears.com adresi de siteyi doğrudan sunacak şekilde yapılandırıldı (canlıda hata veriyordu).</td></tr>
+  <tr><td>2026-10-14</td><td>www.nodiwears.com adresi siteyi sunacak şekilde yapılandırıldı (canlıda hata veriyordu).</td></tr>
+  <tr><td>2026-10-14</td><td>Asıl adres www.nodiwears.com yapıldı; www olmayan adres panelden ona yönlendirilir.</td></tr>
   <tr><td>2026-10-13</td><td>SEO: sayfa başına başlık/açıklama, firma ve sayfa yolu bilgisi, ilgili desen bağlantıları, ana görsel hızlandırma.</td></tr>
 </table>
 </body>

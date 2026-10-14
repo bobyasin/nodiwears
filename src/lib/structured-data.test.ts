@@ -11,17 +11,17 @@ describe('structured data builders', () => {
   it('should describe the organization with its logo and email', () => {
     const schema = buildOrganizationSchema({
       name: 'nodiwears',
-      url: 'https://nodiwears.com',
-      logoUrl: 'https://nodiwears.com/logo.png',
+      url: 'https://www.nodiwears.com',
+      logoUrl: 'https://www.nodiwears.com/logo.png',
       email: 'merhaba@nodiwears.com',
     });
 
-    expect(schema).toMatchObject({ '@type': 'Organization', name: 'nodiwears', logo: 'https://nodiwears.com/logo.png' });
+    expect(schema).toMatchObject({ '@type': 'Organization', name: 'nodiwears', logo: 'https://www.nodiwears.com/logo.png' });
     expect(schema['@context']).toBe('https://schema.org');
   });
 
   it('should describe the website with its language', () => {
-    expect(buildWebSiteSchema({ name: 'nodiwears', url: 'https://nodiwears.com/en/', language: 'en' })).toMatchObject({
+    expect(buildWebSiteSchema({ name: 'nodiwears', url: 'https://www.nodiwears.com/en/', language: 'en' })).toMatchObject({
       '@type': 'WebSite',
       inLanguage: 'en',
     });
@@ -29,13 +29,13 @@ describe('structured data builders', () => {
 
   it('should number breadcrumb items starting from one, in order', () => {
     const schema = buildBreadcrumbSchema([
-      { name: 'Home', url: 'https://nodiwears.com/' },
-      { name: 'Catalog', url: 'https://nodiwears.com/#katalog' },
-      { name: 'Medusa', url: 'https://nodiwears.com/katalog/mitoloji-medusa/' },
+      { name: 'Home', url: 'https://www.nodiwears.com/' },
+      { name: 'Catalog', url: 'https://www.nodiwears.com/#katalog' },
+      { name: 'Medusa', url: 'https://www.nodiwears.com/katalog/mitoloji-medusa/' },
     ]);
 
     expect(schema.itemListElement.map((item) => item.position)).toEqual([1, 2, 3]);
-    expect(schema.itemListElement[2]).toMatchObject({ name: 'Medusa', item: 'https://nodiwears.com/katalog/mitoloji-medusa/' });
+    expect(schema.itemListElement[2]).toMatchObject({ name: 'Medusa', item: 'https://www.nodiwears.com/katalog/mitoloji-medusa/' });
   });
 });
 
