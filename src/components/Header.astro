@@ -69,6 +69,44 @@ const switcher = locales.map((code) => ({
 		nav?.classList.toggle('is-open', open);
 	}
 
+	const header = document.querySelector<HTMLElement>('.site-header');
+
+	function syncScrolled() {
+		header?.classList.toggle('is-scrolled', window.scrollY > 8);
+	}
+
+	window.addEventListener('scroll', syncScrolled, { passive: true });
+	syncScrolled();
+
+	const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.nav ul a'));
+	const sections = navLinks
+		.map((link) => ({ link, section: document.getElementById(link.hash.slice(1)) }))
+		.filter((entry): entry is { link: HTMLAnchorElement; section: HTMLElement } => entry.section !== null);
+
+	if (sections.length > 0) {
+		const spy = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					const match = sections.find(({ section }) => section === entry.target);
+
+					if (match && entry.isIntersecting) {
+						for (const { link } of sections) {
+							link.removeAttribute('aria-current');
+						}
+						match.link.setAttribute('aria-current', 'true');
+					} else if (match && match.link.getAttribute('aria-current') === 'true') {
+						match.link.removeAttribute('aria-current');
+					}
+				}
+			},
+			{ rootMargin: '-35% 0px -55% 0px' },
+		);
+
+		for (const { section } of sections) {
+			spy.observe(section);
+		}
+	}
+
 	toggle?.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
 	nav?.addEventListener('click', (event) => {
 		if (event.target instanceof HTMLAnchorElement) {
@@ -80,46 +118,48 @@ const switcher = locales.map((code) => ({
 <style>
 	.site-header {
 		position: sticky;
-		top: 0.75rem;
+		top: 0;
 		z-index: 10;
-		margin-top: 0.75rem;
+		border-bottom: 1px solid transparent;
+		background: color-mix(in srgb, var(--color-cream) 82%, transparent);
+		backdrop-filter: blur(14px) saturate(1.3);
+		transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+	}
+
+	.site-header.is-scrolled {
+		border-bottom-color: var(--color-line);
+		box-shadow: 0 6px 24px rgb(33 26 56 / 0.06);
 	}
 
 	.bar {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		min-height: 60px;
-		padding: 0.4rem 0.6rem 0.4rem 1.25rem;
-		border: 2px solid var(--color-ink);
-		border-radius: 999px;
-		background: var(--color-paper);
-		box-shadow: var(--shadow);
+		min-height: 68px;
 	}
 
 	.brand {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.55rem;
 		font-family: var(--font-display);
-		font-size: 1.35rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
+		font-size: 1.45rem;
+		font-weight: 700;
+		letter-spacing: -0.02em;
 		text-decoration: none;
 	}
 
 	.dot {
-		width: 0.9rem;
-		height: 0.9rem;
-		border: 2px solid var(--color-ink);
+		width: 0.7rem;
+		height: 0.7rem;
 		border-radius: 50%;
 		background: var(--color-thread);
-		transition: transform 0.3s;
+		box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-thread) 18%, transparent);
+		transition: transform 0.3s var(--ease);
 	}
 
 	.brand:hover .dot {
-		transform: scale(1.5) rotate(90deg);
-		background: var(--color-sun);
+		transform: scale(1.35);
 	}
 
 	.nav {
@@ -131,20 +171,26 @@ const switcher = locales.map((code) => ({
 
 	.lang {
 		display: flex;
-		gap: 0.25rem;
-		margin-left: 0.75rem;
+		gap: 0.15rem;
+		margin-left: 0.9rem;
 		padding: 0.2rem;
-		border: 2px solid var(--color-ink);
+		border: 1px solid var(--color-line-strong);
 		border-radius: 999px;
+		background: var(--color-paper);
 	}
 
 	.lang a,
 	.lang span {
 		padding: 0.2rem 0.65rem;
 		border-radius: 999px;
-		font-size: 0.85rem;
-		font-weight: 800;
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
 		text-decoration: none;
+	}
+
+	.lang a {
+		color: var(--color-ink-soft);
 	}
 
 	.lang a:hover {
@@ -152,7 +198,8 @@ const switcher = locales.map((code) => ({
 	}
 
 	.lang span {
-		background: var(--color-sun);
+		background: var(--color-ink);
+		color: var(--color-paper);
 	}
 
 	.nav ul {
@@ -164,30 +211,44 @@ const switcher = locales.map((code) => ({
 	}
 
 	.nav ul a {
+		position: relative;
 		display: block;
 		padding: 0.45rem 0.9rem;
-		border-radius: 999px;
-		font-weight: 600;
+		font-weight: 500;
 		text-decoration: none;
-		transition: background 0.15s;
 	}
 
-	.nav ul a:hover {
-		background: var(--color-lilac);
+	.nav ul a::after {
+		position: absolute;
+		right: 0.9rem;
+		bottom: 0.2rem;
+		left: 0.9rem;
+		height: 2px;
+		background: var(--color-thread);
+		content: '';
+		scale: 0 1;
+		transform-origin: left;
+		transition: scale 0.3s var(--ease);
+	}
+
+	.nav ul a:hover::after,
+	.nav ul a[aria-current='true']::after {
+		scale: 1 1;
 	}
 
 	.nav-cta {
-		padding: 0.5rem 1.2rem;
-		box-shadow: none;
+		min-height: 42px;
+		padding: 0.5rem 1.25rem;
+		font-size: 0.95rem;
 	}
 
 	.menu-toggle {
 		display: none;
 		width: 44px;
 		height: 44px;
-		border: 0;
+		border: 1px solid var(--color-line-strong);
 		border-radius: 50%;
-		background: var(--color-sun);
+		background: var(--color-paper);
 		cursor: pointer;
 	}
 
@@ -195,7 +256,7 @@ const switcher = locales.map((code) => ({
 	.menu-icon::before,
 	.menu-icon::after {
 		display: block;
-		width: 20px;
+		width: 18px;
 		height: 2px;
 		margin-inline: auto;
 		background: var(--color-ink);
@@ -223,17 +284,16 @@ const switcher = locales.map((code) => ({
 		.nav {
 			display: none;
 			position: absolute;
-			top: calc(100% + 0.6rem);
+			top: 100%;
 			left: 0;
 			right: 0;
 			flex-direction: column;
 			align-items: stretch;
 			gap: 0.75rem;
-			padding: 1rem;
-			border: 2px solid var(--color-ink);
-			border-radius: var(--radius);
-			background: var(--color-paper);
-			box-shadow: var(--shadow);
+			padding: 1rem 1.25rem 1.25rem;
+			border-bottom: 1px solid var(--color-line);
+			background: var(--color-cream);
+			box-shadow: 0 16px 28px rgb(33 26 56 / 0.1);
 		}
 
 		.nav.is-open {

@@ -17,7 +17,7 @@ const colorByCollection = new Map(catalogTree.map((collection, index) => [collec
 
 <section class="section" id="katalog">
 	<div class="container">
-		<h2 class="section-title">{t.title}</h2>
+		<h2 class="section-title" data-reveal>{t.title}</h2>
 
 		<div class="filters" role="group" aria-label={t.filterLabel}>
 			<button type="button" data-filter="all" aria-pressed="true">{t.all}</button>
@@ -32,10 +32,13 @@ const colorByCollection = new Map(catalogTree.map((collection, index) => [collec
 
 		<ul class="grid">
 			{
-				designs.map(({ node, title, collection, rootId }) => (
-					<li data-root={rootId} data-color={colorByCollection.get(rootId)}>
+				designs.map(({ node, title, collection, rootId }, index) => (
+					<li data-root={rootId} data-color={colorByCollection.get(rootId)} data-reveal style={`--i:${index % 6}`}>
 						<a class="card" href={getDesignPath(locale, node.id)}>
-							<span class="label">{collection}</span>
+							<span class="label">
+								<span>{collection}</span>
+								<span class="go" aria-hidden="true">↗</span>
+							</span>
 							<span class="name">{title}</span>
 						</a>
 					</li>
@@ -76,29 +79,31 @@ const colorByCollection = new Map(catalogTree.map((collection, index) => [collec
 
 	.filters button {
 		padding: 0.5rem 1.2rem;
-		border: 2px solid var(--color-ink);
+		border: 1px solid var(--color-line-strong);
 		border-radius: 999px;
 		background: var(--color-paper);
 		color: var(--color-ink);
 		font: inherit;
-		font-weight: 700;
+		font-weight: 600;
 		cursor: pointer;
-		transition: background 0.15s, transform 0.15s;
+		transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s var(--ease);
 	}
 
 	.filters button:hover {
-		transform: translateY(-2px) rotate(-2deg);
+		border-color: var(--color-ink);
+		transform: translateY(-1px);
 	}
 
 	.filters button[aria-pressed='true'] {
-		background: var(--color-sun);
-		box-shadow: 3px 3px 0 var(--color-ink);
+		border-color: var(--color-ink);
+		background: var(--color-ink);
+		color: var(--color-paper);
 	}
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-		gap: 1rem;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+		gap: 1.1rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -121,42 +126,110 @@ const colorByCollection = new Map(catalogTree.map((collection, index) => [collec
 	}
 
 	.grid li[data-color='3'] {
-		--card: var(--color-sun);
+		--card: #f8ebc6;
 	}
 
 	.card {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 		gap: 1.5rem;
 		aspect-ratio: 1;
-		padding: 1rem 1.1rem;
-		border: 3px solid var(--color-ink);
+		padding: 1.1rem 1.2rem;
+		overflow: hidden;
+		border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
 		border-radius: var(--radius);
 		background: var(--card, var(--color-paper));
-		box-shadow: var(--shadow);
 		text-decoration: none;
-		transition: transform 0.15s, box-shadow 0.15s;
+		transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s;
+	}
+
+	/* an embroidery stitch line that sews itself across the card on hover */
+	.card::after {
+		position: absolute;
+		right: 1.2rem;
+		bottom: 0.9rem;
+		left: 1.2rem;
+		height: 0;
+		border-top: 2px dashed var(--color-thread);
+		content: '';
+		clip-path: inset(0 100% 0 0);
+		transition: clip-path 0.5s var(--ease);
 	}
 
 	.card:hover {
-		transform: translate(-2px, -2px) rotate(-1.5deg);
-		box-shadow: 7px 7px 0 var(--color-ink);
+		transform: translateY(-5px);
+		border-color: color-mix(in srgb, var(--color-ink) 30%, transparent);
+		box-shadow: var(--shadow-lift);
+	}
+
+	.card:hover::after,
+	.card:focus-visible::after {
+		clip-path: inset(0 0 0 0);
 	}
 
 	.label {
-		font-size: 0.8rem;
+		position: relative;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.5rem;
+		color: var(--color-ink-soft);
+		font-size: 0.74rem;
 		font-weight: 700;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.go {
+		display: grid;
+		flex: none;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		font-size: 1rem;
+		letter-spacing: 0;
+		transition: transform 0.3s var(--ease), background 0.3s, color 0.3s;
+	}
+
+	.card:hover .go {
+		background: var(--color-thread);
+		color: var(--color-paper);
+		transform: rotate(45deg);
 	}
 
 	.name {
+		position: relative;
+		margin-bottom: 0.9rem;
 		font-family: var(--font-display);
-		font-size: 1.4rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
-		line-height: 1.05;
+		font-size: 1.45rem;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		line-height: 1.1;
 		hyphens: auto;
 		overflow-wrap: anywhere;
+	}
+
+	@media (max-width: 520px) {
+		.grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 0.75rem;
+		}
+
+		.card {
+			padding: 0.9rem;
+		}
+
+		.name {
+			font-size: 1.2rem;
+		}
+
+		.label {
+			font-size: 0.68rem;
+		}
 	}
 </style>

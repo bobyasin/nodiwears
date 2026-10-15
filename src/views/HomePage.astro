@@ -4,7 +4,7 @@ import Contact from '../components/Contact.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import Marquee from '../components/Marquee.astro';
+import Process from '../components/Process.astro';
 import { getOtherLocale, type Locale } from '../i18n/config';
 import { siteConfig } from '../data/site';
 import { getHomePath } from '../i18n/paths';
@@ -31,10 +31,10 @@ const structuredData = [
 
 <Layout locale={locale} alternatePath={alternatePath} structuredData={structuredData}>
 	<Header locale={locale} alternatePath={alternatePath} />
-	<main>
+	<main id="main">
 		<Hero locale={locale} />
-		<Marquee locale={locale} />
 		<Catalog locale={locale} />
+		<Process locale={locale} />
 		<Contact locale={locale} />
 	</main>
 	<Footer locale={locale} />

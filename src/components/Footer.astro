@@ -20,63 +20,119 @@ const rights = formatMessage(t.footer.rights, { year: new Date().getFullYear(), 
 ---
 
 <footer class="footer">
-	<div class="container bar">
+	<div class="container">
+		<p class="wordmark" aria-hidden="true">{siteConfig.name}</p>
+
+		<div class="columns">
+			<div>
+				<p class="tagline">{t.footer.tagline}</p>
+			</div>
+			<nav aria-label={t.footer.menuLabel}>
+				<h2>{t.footer.menuLabel}</h2>
+				<ul>
+					{links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+				</ul>
+			</nav>
+			<nav aria-label={t.footer.policiesLabel}>
+				<h2>{t.footer.policiesLabel}</h2>
+				<ul>
+					{getPolicies(locale).map((policy) => <li><a href={getPolicyPath(locale, policy.slug)}>{policy.title}</a></li>)}
+				</ul>
+			</nav>
+			<div>
+				<h2>{t.footer.contactLabel}</h2>
+				<ul>
+					<li><a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a></li>
+				</ul>
+			</div>
+		</div>
+
 		<p class="copy">{rights}</p>
-		<ul>
-			{links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
-		</ul>
-		<ul class="policies" aria-label={t.footer.policiesLabel}>
-			{getPolicies(locale).map((policy) => <li><a href={getPolicyPath(locale, policy.slug)}>{policy.title}</a></li>)}
-		</ul>
 	</div>
 </footer>
 
 <style>
 	.footer {
-		padding-block: 2rem;
+		margin-top: 3rem;
+		padding-block: 3rem 2rem;
+		border-top: 0;
+		background: var(--color-ink);
+		color: var(--color-cream);
 		font-size: 0.95rem;
 	}
 
-	.bar {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
-		padding-top: 1.5rem;
-		border-top: 3px solid var(--color-ink);
+	.wordmark {
+		margin: 0 0 2rem;
+		color: var(--color-sun);
+		font-family: var(--font-display);
+		font-size: clamp(3rem, 14vw, 9rem);
+		font-weight: 600;		letter-spacing: -0.05em;
+		line-height: 0.9;
 	}
 
-	.copy {
+	.columns {
+		display: grid;
+		grid-template-columns: 1.4fr repeat(3, 1fr);
+		gap: 2rem;
+		padding-block: 1.75rem;
+		border-block: 1px solid color-mix(in srgb, var(--color-cream) 18%, transparent);
+	}
+
+	h2 {
+		margin: 0 0 0.75rem;
+		color: var(--color-lilac);
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.tagline {
+		max-width: 22ch;
 		margin: 0;
-		color: var(--color-ink-soft);
+		font-family: var(--font-display);
+		font-size: 1.3rem;
+		font-weight: 600;		line-height: 1.2;
 	}
 
 	ul {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1.25rem;
+		display: grid;
+		gap: 0.5rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
-	.policies {
-		flex-basis: 100%;
+	.copy {
+		margin: 1.5rem 0 0;
+		color: var(--color-lilac);
 		font-size: 0.88rem;
 	}
 
-	.policies a {
-		font-weight: 500;
-		text-decoration: underline;
-	}
-
 	a {
-		font-weight: 600;
 		text-decoration: none;
+		overflow-wrap: anywhere;
 	}
 
 	a:hover {
-		color: var(--color-thread);
+		color: var(--color-sun);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	a:focus-visible {
+		outline-color: var(--color-sun);
+	}
+
+	@media (max-width: 820px) {
+		.columns {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.columns {
+			grid-template-columns: 1fr;
+		}
 	}
 </style>

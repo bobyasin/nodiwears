@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout locale="tr" title="404 | nodiwears" description="Sayfa bulunamadı / Page not found" noindex>
-	<main class="not-found">
+	<main id="main" class="not-found">
 		<div class="container">
 			<p class="code" aria-hidden="true">404</p>
 			<h1>Sayfa bulunamadı<br /><span>Page not found</span></h1>
@@ -27,11 +27,10 @@ import Layout from '../layouts/Layout.astro';
 		margin: 0;
 		font-family: var(--font-display);
 		font-size: clamp(6rem, 25vw, 14rem);
-		font-weight: 800;
-		letter-spacing: -0.05em;
+		font-weight: 600;
+		letter-spacing: -0.04em;
 		line-height: 1;
-		-webkit-text-stroke: 3px var(--color-ink);
-		color: var(--color-pink);
+		color: var(--color-line-strong);
 	}
 
 	h1 {

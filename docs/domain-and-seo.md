@@ -20,7 +20,7 @@ Site alan adı bilmediği için mutlak adres gerektiren özellikler (canonical, 
 
 ## Out of Scope
 - Alan adının Cloudflare'e taşınması ve DNS bölgesinin aktifleştirilmesi (panel işi). apex → `www` yönlendirme kuralı panelden tanımlanır (aşağıya bakın).
-- E-posta altyapısı (`merhaba@nodiwears.com` kutusu/yönlendirmesi).
+- E-posta altyapısı: `merhaba@nodiwears.com` Google Workspace üzerinde çalışır; hesap, kullanıcı/grup ve DNS kayıtları (MX, SPF, DKIM, DMARC) panelden kurulur (aşağıya bakın).
 - Arama motoru hesapları (Search Console/Bing) ve yapılandırılmış veri (JSON-LD).
 
 ## Business Requirements
@@ -90,7 +90,14 @@ Build ve testler başarılı; `wrangler deploy --dry-run` başarılı; QA senary
 3. apex adresini `www`'ye yönlendirin: Rules → Redirect Rules'ta ana makine adı `nodiwears.com` ise `concat("https://www.nodiwears.com", http.request.uri.path)` adresine 301 (sorgu dizesi korunarak). Kural Worker'dan önce çalışır.
 4. SSL/TLS → Edge Certificates: "Always Use HTTPS" açık.
 5. Google Search Console ve Bing Webmaster'da alan adını doğrulayıp `https://www.nodiwears.com/sitemap.xml` gönderin.
-6. E-posta: iletişim formu `merhaba@nodiwears.com`'a yazdığı için bu adres bir kutuya ulaşmalı (ör. Cloudflare Email Routing ile kişisel kutuya yönlendirme).
+6. E-posta (Google Workspace): iletişim formu `merhaba@nodiwears.com`'a yazdığı için bu adres teslim alınabilmeli. Cloudflare DNS'te (hepsi **DNS only**, MX/TXT zaten proxy'lenemez):
+   - Alan adı doğrulama: Workspace'in verdiği `google-site-verification=...` TXT kaydı (apex).
+   - MX: Google Admin → Gmail etkinleştirme sayfasındaki güncel değerler (genelde `smtp.google.com`, öncelik 1; eski kurulumda `ASPMX.L.GOOGLE.COM` 1 ve `ALT1/ALT2.ASPMX.L.GOOGLE.COM` 5, `ALT3/ALT4.ASPMX.L.GOOGLE.COM` 10).
+   - SPF: apex TXT `v=spf1 include:_spf.google.com ~all` (tek SPF kaydı olmalı).
+   - DKIM: Admin → Apps → Google Workspace → Gmail → Authenticate email'de anahtar üretilir; `google._domainkey` TXT kaydı eklenip "Start authentication" ile açılır.
+   - DMARC: `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:<rapor adresi>`; raporlar temiz görününce `quarantine`/`reject` seviyesine çıkarılır.
+   - Cloudflare Email Routing açık olmamalı (kendi MX kayıtlarını ekler, Google ile çakışır).
+   - `merhaba@` adresi için paylaşımlı gelen kutusu gerekiyorsa kullanıcı yerine Google Grubu veya takma ad (alias) kullanılır.
 
 ## Known Limitations
 - apex → `www` yönlendirmesi kod ile değil panelden tanımlanır (her istekte Worker çalıştırmamak ve host eşleşmesi yapabilmek için). Kural tanımlanana kadar apex de siteyi sunar.
@@ -105,3 +112,4 @@ Build ve testler başarılı; `wrangler deploy --dry-run` başarılı; QA senary
 | 2026-10-13 | SEO: anahtar kelimeli başlık/açıklama, JSON-LD, ilgili desen bağlantıları, hero LCP önceliği. |
 | 2026-10-14 | `www.nodiwears.com` özel alan adı olarak eklendi (canlıda 522 veriyordu: Worker'a bağlı değildi). |
 | 2026-10-14 | Ana adres `www.nodiwears.com` yapıldı (canonical, sitemap, robots); apex panelden `www`'ye yönlendirilir. |
+| 2026-10-14 | E-posta için Google Workspace DNS adımları (MX, SPF, DKIM, DMARC) belgelendi; Cloudflare Email Routing önerisi kaldırıldı. |

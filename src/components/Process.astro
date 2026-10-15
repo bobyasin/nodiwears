@@ -1,0 +1,109 @@
+---
+import type { Locale } from '../i18n/config';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].process;
+const steps = [
+	{ title: t.step1Title, text: t.step1Text },
+	{ title: t.step2Title, text: t.step2Text },
+	{ title: t.step3Title, text: t.step3Text },
+	{ title: t.step4Title, text: t.step4Text },
+];
+---
+
+<section class="section" id="surec">
+	<div class="container">
+		<p class="eyebrow" data-reveal>{t.eyebrow}</p>
+		<h2 class="section-title" data-reveal>{t.title}</h2>
+
+		<ol class="steps">
+			{
+				steps.map((step, index) => (
+					<li data-reveal style={`--i:${index}`}>
+						<span class="num">{String(index + 1).padStart(2, '0')}</span>
+						<h3>{step.title}</h3>
+						<p>{step.text}</p>
+					</li>
+				))
+			}
+		</ol>
+	</div>
+</section>
+
+<style>
+	.steps {
+		position: relative;
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 1.5rem;
+		margin: 2.5rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	@media (max-width: 899px) {
+		.steps {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 2rem 1.5rem;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.steps {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	/* the "thread" that runs through the numbered steps */
+	@media (min-width: 900px) {
+		.steps::before {
+			position: absolute;
+			top: 1.45rem;
+			right: 12%;
+			left: 12%;
+			border-top: 2px dashed var(--color-line-strong);
+			content: '';
+		}
+	}
+
+	li {
+		position: relative;
+		padding: 0 0.25rem;
+	}
+
+	.num {
+		position: relative;
+		display: grid;
+		place-items: center;
+		width: 2.9rem;
+		height: 2.9rem;
+		margin-bottom: 1.1rem;
+		border: 1px solid var(--color-ink);
+		border-radius: 50%;
+		background: var(--color-cream);
+		font-family: var(--font-display);
+		font-size: 1rem;
+		font-weight: 600;
+		transition: background 0.3s, color 0.3s;
+	}
+
+	li:hover .num {
+		background: var(--color-ink);
+		color: var(--color-paper);
+	}
+
+	h3 {
+		margin-bottom: 0.4rem;
+		font-size: 1.3rem;
+	}
+
+	p {
+		margin: 0;
+		color: var(--color-ink-soft);
+	}
+</style>

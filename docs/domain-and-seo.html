@@ -43,7 +43,7 @@
   <tr><td>"www" adresi 522 hatası veriyor</td><td>"www" için Worker'a bağlı özel alan adı yok veya çakışan elle eklenmiş bir DNS kaydı var; yayını yeniden yapmak (ve gerekirse çakışan kaydı silmek) çözer.</td></tr>
   <tr><td>Alan adı Cloudflare hesabında henüz aktif değil</td><td>Yayın sırasında alan adı bağlanamaz; önce alan adı Cloudflare'e eklenmelidir.</td></tr>
   <tr><td>Site "…workers.dev" geçici adresinden açılırsa</td><td>Sayfa açılır ama arama motoruna asıl adres olarak www.nodiwears.com bildirilir.</td></tr>
-  <tr><td>"merhaba@nodiwears.com" için e-posta kutusu yok</td><td>İletişim formundan gelen talepler ulaşmaz; e-posta yönlendirmesi kurulmalıdır.</td></tr>
+  <tr><td>"merhaba@nodiwears.com" için e-posta kutusu veya DNS kayıtları (MX) yok</td><td>İletişim formundan gelen talepler ulaşmaz; Google Workspace e-postası ve DNS kayıtları kurulmalıdır.</td></tr>
 </table>
 
 <h2>QA test senaryoları</h2>
@@ -57,7 +57,7 @@
   <tr><td>6</td><td>Var olmayan bir adres aç</td><td>"Sayfa bulunamadı" sayfası görünür.</td></tr>
   <tr><td>8</td><td>Bir desen sayfasının altına bak</td><td>Aynı koleksiyondaki diğer desenlere bağlantılar görünür ve çalışır.</td></tr>
   <tr><td>9</td><td>Google'ın "Rich Results Test" aracında ana sayfayı ve bir desen sayfasını dene</td><td>Hata çıkmaz; firma bilgisi ve sayfa yolu algılanır.</td></tr>
-  <tr><td>7</td><td>İletişim formundan talep gönder</td><td>E-posta merhaba@nodiwears.com kutusuna ulaşır.</td></tr>
+  <tr><td>7</td><td>Dışarıdan (ör. kişisel bir Gmail'den) merhaba@nodiwears.com adresine e-posta gönder; ayrıca iletişim formundan talep gönder</td><td>İkisi de Google Workspace gelen kutusuna ulaşır. Workspace'ten dışarıya gönderilen e-posta spam'e düşmez (SPF/DKIM/DMARC geçer).</td></tr>
 </table>
 
 <h2>Kabul kriterleri</h2>
@@ -72,7 +72,7 @@
   <li>Önce panelde "www" için elle eklenmiş DNS kaydı varsa silin (aksi halde bağlama hata verir), sonra siteyi yayınlayın; www.nodiwears.com ve nodiwears.com kendiliğinden bağlanır.</li>
   <li>"Always Use HTTPS"i açın ve nodiwears.com → www.nodiwears.com yönlendirme kuralını ekleyin.</li>
   <li>Google Search Console ve Bing'e alan adını doğrulatıp site haritasını gönderin.</li>
-  <li>merhaba@nodiwears.com için e-posta yönlendirmesi kurun.</li>
+  <li>merhaba@nodiwears.com için Google Workspace e-posta kurulumunu yapın (MX, SPF, DKIM ve DMARC kayıtları Cloudflare DNS'e eklenir; Cloudflare Email Routing kullanılmaz).</li>
 </ol>
 
 <h2>Bilinen sınırlar</h2>
@@ -87,6 +87,7 @@
   <tr><td>2026-10-13</td><td>İlk sürüm: nodiwears.com yapılandırması, site haritası, dil karşılıkları ve paylaşım önizlemesi.</td></tr>
   <tr><td>2026-10-14</td><td>www.nodiwears.com adresi siteyi sunacak şekilde yapılandırıldı (canlıda hata veriyordu).</td></tr>
   <tr><td>2026-10-14</td><td>Asıl adres www.nodiwears.com yapıldı; www olmayan adres panelden ona yönlendirilir.</td></tr>
+  <tr><td>2026-10-14</td><td>E-posta için Google Workspace kurulum adımları (DNS kayıtları) eklendi.</td></tr>
   <tr><td>2026-10-13</td><td>SEO: sayfa başına başlık/açıklama, firma ve sayfa yolu bilgisi, ilgili desen bağlantıları, ana görsel hızlandırma.</td></tr>
 </table>
 </body>

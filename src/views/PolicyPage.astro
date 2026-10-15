@@ -28,7 +28,7 @@ const alternatePath = getPolicyPath(otherLocale, otherSlug);
 	alternatePath={alternatePath}
 >
 	<Header locale={locale} alternatePath={alternatePath} />
-	<main>
+	<main id="main">
 		<article class="section policy">
 			<div class="container">
 				<a class="back" href={getHomePath(locale)}>{t.back}</a>
@@ -86,7 +86,7 @@ const alternatePath = getPolicyPath(otherLocale, otherSlug);
 	.back {
 		display: inline-block;
 		padding: 0.35rem 1rem;
-		border: 2px solid var(--color-ink);
+		border: 1px solid var(--color-line-strong);
 		border-radius: 999px;
 		background: var(--color-paper);
 		font-weight: 700;
@@ -95,7 +95,7 @@ const alternatePath = getPolicyPath(otherLocale, otherSlug);
 	}
 
 	.back:hover {
-		background: var(--color-sun);
+		background: var(--color-lilac);
 	}
 
 	h1 {
@@ -136,7 +136,7 @@ const alternatePath = getPolicyPath(otherLocale, otherSlug);
 	th,
 	td {
 		padding: 0.6rem 0.8rem;
-		border: 2px solid var(--color-ink);
+		border: 1px solid var(--color-line-strong);
 		text-align: left;
 		vertical-align: top;
 	}
