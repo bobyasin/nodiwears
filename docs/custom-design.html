@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Özel Tasarım Siparişi - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+  .flow { padding: .8rem 1rem; background: #f4eeff; border-radius: 10px; }
+</style>
+</head>
+<body>
+<h1>Özel Tasarım Siparişi</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Ziyaretçiler kendi görselleriyle özel nakış siparişi verebilir. Sipariş; ürün, renk, beden, görsel ve iletişim bilgisiyle eksiksiz hazırlanır ve görsel yüklemek için KVKK açık rızası alınır.</p>
+
+<h2>Beklenen davranış</h2>
+<p class="flow">1) Ürün seç → 2) Renk ve beden seç → 3) Rıza ver ve görseli yükle → 4) Önizlemeyi gör, not/ad/e-posta yaz, onayla</p>
+<ul>
+  <li>Sayfa: Türkçe <b>/ozel-tasarim/</b>, İngilizce <b>/en/custom-design/</b>. Ana sayfadaki "Özel tasarım iste" butonu, üst menü ve alt menüdeki "Özel tasarım" bağlantısı buraya götürür.</li>
+  <li><b>Adım 1 – Ürün:</b> tişört, gömlek, hoodie, şort, şapka, buf, çorap.</li>
+  <li><b>Adım 2 – Renk, beden ve baskı ebatı:</b> 12 renk. Giyimde XS–XXL, çorapta 35-38 / 39-42 / 43-46, şapka ve bufta "Standart". Baskı ebatı için hazır seçenekler vardır (Küçük 8×8, <b>Orta 15×12 – başta seçili</b>, Büyük 25×18, Maksimum 36×20 cm); isteyen "Özel ölçü" ile genişlik ve yüksekliği kendisi yazar.</li>
+  <li><b>Adım 3 – Görsel:</b> önce "açık rıza" kutusu işaretlenir (zorunlu); işaretlenmeden görsel seçilemez. Kurallar ekranda yazar.</li>
+  <li><b>Adım 4 – Önizleme ve onay:</b> ürün seçilen renkte görünür, görsel üzerine yerleşir. Sipariş özeti, isteğe bağlı not, ad ve e-posta bulunur. "Siparişi onayla" ile sipariş bize iletilir.</li>
+  <li>Her adımda "Geri" ile dönülebilir; tamamlanan adımlara üstteki numaralardan da gidilebilir.</li>
+</ul>
+
+<h2>Görsel kuralları</h2>
+<table>
+  <tr><th>Kural</th><th>Değer</th></tr>
+  <tr><td>Biçim</td><td>JPG, PNG veya WEBP</td></tr>
+  <tr><td>En büyük dosya boyutu</td><td>8 MB</td></tr>
+  <tr><td>Kısa kenar (en az)</td><td>800 piksel</td></tr>
+  <tr><td>Uzun kenar (en çok)</td><td>6000 piksel</td></tr>
+  <tr><td>Kullanım hakkı</td><td>Görselin hakkı sipariş verene ait olmalı</td></tr>
+</table>
+
+<h2>Baskı ebatı ve baskı yeri kuralları</h2>
+<p>Baskı ebatı ürüne göre sınırlanır: şapkaya tişört boyu baskı verilemez. Ürün seçilince "Orta" ebat otomatik gelir.</p>
+<table>
+  <tr><th>Ürün</th><th>En büyük baskı (genişlik × yükseklik)</th><th>Hazır ebatlar (cm)</th></tr>
+  <tr><td>Tişört, Hoodie</td><td>36 × 20</td><td>8×8 · <b>15×12</b> · 25×18 · 36×20</td></tr>
+  <tr><td>Gömlek</td><td>12 × 10</td><td>5×5 · <b>9×8</b> · 12×10</td></tr>
+  <tr><td>Şort</td><td>12 × 10</td><td>5×5 · <b>8×7</b> · 12×10</td></tr>
+  <tr><td>Şapka</td><td>10 × 6</td><td>4×3 · <b>7×5</b> · 10×6</td></tr>
+  <tr><td>Buf</td><td>14 × 8</td><td>6×4 · <b>10×6</b> · 14×8</td></tr>
+  <tr><td>Çorap</td><td>6 × 8</td><td>3×3 · <b>4×5</b> · 6×8</td></tr>
+</table>
+<p>"Özel ölçü" ile ürünün en büyük ölçüsüne kadar istenen ebat yazılır (en az 2 × 2 cm).</p>
+<ul>
+  <li><b>Baskı yeri:</b> ürün resminde kesikli çerçeveyle gösterilen baskı bölgesi vardır. Ziyaretçi resme tıklayarak, ok tuşlarıyla ya da hazır noktalarla yeri seçer (ör. Tişört: Ortada, Sol göğüs, Sağ göğüs; Şapka: Önde, Sol yan, Sağ yan; Çorap ve Buf: Üstte, Ortada, Altta).</li>
+  <li>Baskının kutusu seçilen ebat kadar görünür ve bölgenin dışına çıkamaz. Ebat büyütülünce kutu bölgenin içine geri çekilir.</li>
+  <li>4. adımdaki önizleme görseli seçilen yerde ve ebatta gösterir.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Baskı, ürünün en büyük ölçüsünü aşamaz ve baskı bölgesinin dışına konamaz. Önizleme görseli seçilen ebatta ve yerde gösterir.</li>
+  <li>Açık rıza olmadan görsel yüklenemez. Rıza kutusu sonradan kaldırılırsa yüklenen görsel silinir.</li>
+  <li>Ürün değiştirilirse beden seçimi sıfırlanır; yeni ürüne uygun bedenler gösterilir.</li>
+  <li>Önizleme temsilidir. Nakışın ölçüsü ve yeri sipariş sonrası ziyaretçiyle netleştirilir.</li>
+  <li>Not en fazla 500, ad en fazla 100 karakter olabilir. Not isteğe bağlıdır; ad ve e-posta zorunludur.</li>
+  <li>Hiçbir bilgi ziyaretçinin tarayıcısında saklanmaz; görsel yalnızca "Siparişi onayla" denince gönderilir.</li>
+</ul>
+
+<h2>Önemli not: sipariş e-postası</h2>
+<p>Siparişin bize e-posta ile ulaşmasını sağlayan sunucu tarafı <b>henüz yapılmadı</b>. Bu yüzden sayfada "Siparişi onayla" düğmesi pasiftir ("Sipariş gönderimi çok yakında") ve ziyaretçiye talebinin şimdilik iletilmediği yazılır. Sunucu hazır olunca aynı sayfa siparişi gönderecek ve "Siparişiniz bize ulaştı" ekranını gösterecektir.</p>
+
+<h2>Hata durumları</h2>
+<table>
+  <tr><th>Durum</th><th>Ziyaretçi ne görür</th></tr>
+  <tr><td>Ürün / renk / beden seçilmeden "Devam"</td><td>İlgili seçimi isteyen uyarı; sonraki adıma geçilmez.</td></tr>
+  <tr><td>Rıza işaretlenmeden devam</td><td>"Görsel yüklemek için açık rızanızı işaretleyin."</td></tr>
+  <tr><td>Görsel yüklenmeden devam</td><td>"Lütfen bir görsel yükleyin."</td></tr>
+  <tr><td>JPG/PNG/WEBP dışı dosya (ör. GIF, SVG, PDF)</td><td>Biçim uyarısı; dosya kabul edilmez.</td></tr>
+  <tr><td>8 MB'dan büyük dosya</td><td>Boyut uyarısı.</td></tr>
+  <tr><td>Kısa kenarı 800 pikselden küçük görsel</td><td>Çözünürlük uyarısı.</td></tr>
+  <tr><td>Uzun kenarı 6000 pikselden büyük görsel</td><td>Ölçü uyarısı.</td></tr>
+  <tr><td>Bozuk / okunamayan görsel</td><td>"Görsel okunamadı. Başka bir dosya deneyin."</td></tr>
+  <tr><td>Özel ölçü boş, ürünün en büyüğünden büyük (ör. şapkada 25×18) veya 2×2 cm'den küçük</td><td>Ebat uyarısı (ürünün kendi sınırı yazılır); adım değişmez.</td></tr>
+  <tr><td>Ad veya geçerli e-posta yok</td><td>İlgili alanı isteyen uyarı; sipariş gönderilmez.</td></tr>
+  <tr><td>Gönderim başarısız (sunucu hazır olunca)</td><td>"Siparişiniz gönderilemedi. Lütfen biraz sonra tekrar deneyin." Bilgiler korunur.</td></tr>
+</table>
+
+<h2>Sınır durumlar</h2>
+<ul>
+  <li>Görsel seçildikten sonra rıza kaldırılırsa görsel silinir ve görsel seçme tekrar kilitlenir.</li>
+  <li>Önceki adıma dönüp ürünü değiştirmek bedeni sıfırlar.</li>
+  <li>Uzun dosya adları taşmaz, satıra kırılır.</li>
+  <li>İngilizce sayfada tüm metinler ve uyarılar İngilizcedir.</li>
+</ul>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Ana sayfada "Özel tasarım iste"ye bas</td><td>/ozel-tasarim/ açılır, 1. adım görünür.</td></tr>
+  <tr><td>2</td><td>Ürün seçmeden "Devam"</td><td>"Lütfen bir ürün seçin." çıkar, adım değişmez.</td></tr>
+  <tr><td>3</td><td>Hoodie seç, devam; bedenlere bak</td><td>XS, S, M, L, XL, XXL görünür.</td></tr>
+  <tr><td>4</td><td>Çorap seç</td><td>35-38, 39-42, 43-46 görünür.</td></tr>
+  <tr><td>5</td><td>Şapka seç</td><td>Yalnızca "Standart" beden görünür.</td></tr>
+  <tr><td>5a</td><td>2. adımda baskı ebatına bak (tişört, sonra şapka)</td><td>Ürüne göre hazır ebatlar değişir; "Şapka için en fazla 10 × 6 cm" gibi bir not yazar.</td></tr>
+  <tr><td>5b</td><td>Şapkada özel ölçüye 25×18, tişörtte 40×10, 1×10 ve boş dene</td><td>Her biri uygun uyarıyla reddedilir; ürünün en büyük ölçüsü kabul edilir.</td></tr>
+  <tr><td>5c</td><td>Ürün resmine farklı yerlere tıkla</td><td>Baskı kutusu tıklanan yere gelir, bölgenin dışına çıkmaz; "Özel konum" yazar.</td></tr>
+  <tr><td>5d</td><td>Resme odaklanıp ok tuşlarına (Shift'li ve Shift'siz) bas</td><td>Kutu 1 (Shift ile 4) birim kayar, bölgede kalır.</td></tr>
+  <tr><td>5e</td><td>Hazır noktalardan birini seç (ör. Sol göğüs)</td><td>Kutu o noktaya gider ve nokta seçili görünür.</td></tr>
+  <tr><td>5f</td><td>Büyük ebat seçip kutuyu kenara getir, sonra daha da büyüt</td><td>Kutu bölgenin içine geri çekilir.</td></tr>
+  <tr><td>5g</td><td>4. adımda önizlemeye ve özete bak</td><td>Görsel seçilen yerde ve ebatla görünür; özette "Baskı yeri" ve "Baskı ebatı" doğrudur.</td></tr>
+  <tr><td>6</td><td>3. adımda rıza vermeden görsel seçmeyi dene</td><td>Görsel seçme pasif; "Önce izni işaretleyin" yazar.</td></tr>
+  <tr><td>7</td><td>Rıza ver; GIF, SVG, 9 MB dosya, 500×500 görsel dene</td><td>Her biri kendi uyarısıyla reddedilir.</td></tr>
+  <tr><td>8</td><td>1200×1000 PNG yükle</td><td>Küçük resim, dosya adı ve ölçü görünür.</td></tr>
+  <tr><td>9</td><td>Görsel yüklüyken rıza kutusunu kaldır</td><td>Görsel silinir.</td></tr>
+  <tr><td>10</td><td>4. adıma geç</td><td>Ürün seçilen renkte görünür, görsel üzerinde yer alır; özet doğrudur.</td></tr>
+  <tr><td>11</td><td>Ad/e-posta boş veya hatalı bırakıp onayla</td><td>Uyarı çıkar. (Gönderim canlıyken) sipariş gönderilmez.</td></tr>
+  <tr><td>12</td><td>Üstteki numaralardan 1. adıma dön</td><td>Seçimler korunmuştur.</td></tr>
+  <tr><td>13</td><td>Dili EN yap (sayfada)</td><td>/en/custom-design/ açılır, tüm metinler İngilizce.</td></tr>
+  <tr><td>14</td><td>Telefon genişliğinde aç</td><td>Adımlar ve alanlar taşmadan tek sütunda görünür.</td></tr>
+  <tr><td>15</td><td>(Sunucu hazır olunca) tam siparişi onayla</td><td>Teşekkür ekranı; e-posta görsel ekiyle bize ulaşır.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>İki dilde sayfa menüden ve ana sayfa butonundan ulaşılabilir.</li>
+  <li>Dört adım sırayla tamamlanır; eksik adımda ilerlenemez.</li>
+  <li>Rıza olmadan görsel seçilemez; geçersiz görseller doğru mesajla reddedilir.</li>
+  <li>Baskı ebadı ürüne göre sınırlanır; hazır ve özel ölçü çalışır.</li>
+  <li>Baskı yeri resme tıklayarak, ok tuşlarıyla veya hazır noktalarla seçilir ve bölge dışına çıkamaz.</li>
+  <li>Önizleme seçilen rengi, görseli, ebadı ve yeri doğru gösterir.</li>
+  <li>Sunucu hazır değilken onay düğmesi pasiftir ve nedeni yazılıdır.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-15</td><td>Baskı ebatı ürüne bağlandı; baskı yeri seçimi ve önizlemede yer gösterimi eklendi.</td></tr>
+  <tr><td>2026-10-15</td><td>Baskı ebatı eklendi (hazır ebatlar + özel ölçü).</td></tr>
+  <tr><td>2026-10-15</td><td>İlk sürüm: sihirbaz arayüzü, doğrulamalar, iki dil. Sipariş e-postası (sunucu) kapsam dışı.</td></tr>
+</table>
+</body>
+</html>

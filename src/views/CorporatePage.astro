@@ -1,0 +1,221 @@
+---
+import CorporateTabs from '../components/CorporateTabs.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import StitchPortraits from '../components/StitchPortraits.astro';
+import { getPolicies } from '../data/policies';
+import { siteConfig } from '../data/site';
+import { getOtherLocale, type Locale } from '../i18n/config';
+import { getPagePath, getPolicyPath, type PageId } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import Layout from '../layouts/Layout.astro';
+
+type CorporatePageId = Extract<PageId, 'about' | 'whoWeAre' | 'certificates'>;
+
+interface Props {
+	locale: Locale;
+	page: CorporatePageId;
+}
+
+const { locale, page } = Astro.props;
+const about = ui[locale].about;
+const who = ui[locale].whoWeAre;
+const certificates = ui[locale].certificates;
+const copy = { about, whoWeAre: who, certificates }[page];
+const alternatePath = getPagePath(getOtherLocale(locale), page);
+const promises = [about.promise1, about.promise2, about.promise3];
+const documents = [certificates.doc1, certificates.doc2, certificates.doc3];
+---
+
+<Layout
+	locale={locale}
+	title={`${copy.seoTitle} | ${siteConfig.name}`}
+	description={copy.description}
+	alternatePath={alternatePath}
+>
+	<Header locale={locale} alternatePath={alternatePath} />
+	<main id="main">
+		<section class="section corporate">
+			<div class={page === 'whoWeAre' ? 'container justify' : 'container'}>
+				<div class="tabs"><CorporateTabs locale={locale} current={page} /></div>
+
+				<p class="eyebrow">{copy.eyebrow}</p>
+				<h1 class="section-title">{copy.title}</h1>
+				<p class="section-lead">{copy.lead}</p>
+
+				{
+					page === 'about' && (
+						<div class="blocks">
+							<section>
+								<h2>{about.storyTitle}</h2>
+								<p>{about.storyP1}</p>
+								<p>{about.storyP2}</p>
+							</section>
+							<section>
+								<h2>{about.promiseTitle}</h2>
+								<ul class="promises">
+									{promises.map((promise) => <li>{promise}</li>)}
+								</ul>
+							</section>
+						</div>
+					)
+				}
+
+				{
+					page === 'whoWeAre' && (
+						<div class="blocks">
+							<p class="intro">{who.intro2}</p>
+							<StitchPortraits locale={locale} />
+						</div>
+					)
+				}
+
+				{
+					page === 'certificates' && (
+						<div class="blocks">
+							<section>
+								<h2>{certificates.documentsTitle}</h2>
+								<ul class="documents">
+									{
+										documents.map((document) => (
+											<li>
+												<span class="doc-icon" aria-hidden="true">▤</span>
+												<span class="doc-name">{document}</span>
+												<span class="badge">{certificates.soon}</span>
+											</li>
+										))
+									}
+								</ul>
+							</section>
+							<section>
+								<h2>{certificates.policiesTitle}</h2>
+								<ul class="policies">
+									{
+										getPolicies(locale).map((policy) => (
+											<li>
+												<a href={getPolicyPath(locale, policy.slug)}>{policy.title}</a>
+											</li>
+										))
+									}
+								</ul>
+							</section>
+						</div>
+					)
+				}
+			</div>
+		</section>
+	</main>
+	<Footer locale={locale} />
+</Layout>
+
+<style>
+	.container {
+		max-width: 820px;
+	}
+
+	.tabs {
+		margin-bottom: 2rem;
+	}
+
+	/* Biz kimiz reads as running text: justified, with hyphenation to keep the gaps even. */
+	.justify :global(.section-lead),
+	.justify .blocks > p,
+	.justify .intro {
+		/* as wide as the cards below, so the right edge lines up with them */
+		max-width: none;
+		text-align: justify;
+		text-justify: inter-word;
+		text-wrap: wrap;
+		hyphens: auto;
+	}
+
+	.justify .intro {
+		margin: 0;
+		color: var(--color-ink-soft);
+		font-size: 1.2rem;
+	}
+
+	.blocks {
+		display: grid;
+		gap: 2.5rem;
+		margin-top: 2.5rem;
+	}
+
+	h2 {
+		font-size: 1.6rem;
+	}
+
+	.blocks section p {
+		max-width: 62ch;
+		color: var(--color-ink-soft);
+		font-size: 1.05rem;
+	}
+
+	.promises,
+	.policies {
+		display: grid;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.promises li {
+		display: flex;
+		gap: 0.7rem;
+		padding: 0.9rem 1.1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 14px;
+		background: var(--color-paper);
+	}
+
+	.promises li::before {
+		color: var(--color-thread);
+		font-weight: 700;
+		content: '✓';
+	}
+
+	.documents {
+		display: grid;
+		gap: 0.7rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.documents li {
+		display: flex;
+		align-items: center;
+		gap: 0.8rem;
+		padding: 1rem 1.1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 14px;
+		background: var(--color-paper);
+	}
+
+	.doc-icon {
+		color: var(--color-ink-soft);
+		font-size: 1.4rem;
+	}
+
+	.doc-name {
+		flex: 1;
+		font-weight: 600;
+	}
+
+	.badge {
+		padding: 0.2rem 0.7rem;
+		border-radius: 999px;
+		background: var(--color-lilac);
+		font-size: 0.78rem;
+		font-weight: 700;
+	}
+
+	.policies a {
+		display: inline-block;
+		padding: 0.4rem 0;
+		font-weight: 700;
+		text-decoration-color: var(--color-thread);
+		text-underline-offset: 4px;
+	}
+</style>

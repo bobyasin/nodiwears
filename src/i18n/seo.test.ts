@@ -55,6 +55,18 @@ describe.each(locales)('SEO copy (%s)', (locale) => {
     }
   });
 
+  it('should keep the custom design page title and description within limits', () => {
+    expectGoodTitle(`${t.customDesign.seoTitle} | ${siteConfig.name}`);
+    expectGoodDescription(t.customDesign.description);
+  });
+
+  it('should keep every standalone page title and description within limits', () => {
+    for (const page of [t.productsPage, t.about, t.whoWeAre, t.certificates, t.contactPage]) {
+      expectGoodTitle(`${page.seoTitle} | ${siteConfig.name}`);
+      expectGoodDescription(page.description);
+    }
+  });
+
   it('should mention the product in the home title for search relevance', () => {
     expect(`${siteConfig.name} ${t.meta.tagline}`.toLowerCase()).toMatch(/nakış|embroidery/);
   });

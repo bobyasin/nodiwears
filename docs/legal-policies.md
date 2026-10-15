@@ -72,7 +72,7 @@ Yok (tarayıcı test altyapısı yok). Eklenirse: bildirim görünür/kapanır/h
 Build ve testler başarılı; QA senaryoları geçer; metinler sitenin gerçek davranışını doğru anlatır.
 
 ## Deployment / Migration Considerations
-Yayın öncesi: `siteConfig` içindeki ticari unvan/adres/telefon/e-posta gerçek değerlerle doldurulmalı ve metinler bir hukukçu tarafından gözden geçirilmeli.
+Yayın öncesi: `siteConfig` içindeki ticari unvan/adres/telefon/e-posta gerçek değerlerle doldurulmalı (adres ve telefon şimdilik boştur ve KVKK metninin iletişim satırından çıkarılır; KVKK aydınlatma metninde veri sorumlusu adresi normalde bulunması gereken bir bilgidir) ve metinler bir hukukçu tarafından gözden geçirilmeli.
 
 ## Known Limitations
 - Metinler genel şablondur; hukuki danışmanlık yerine geçmez.

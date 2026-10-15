@@ -1,0 +1,327 @@
+---
+import type { Locale } from '../i18n/config';
+import { getCustomDesignPath, getHomePath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import { MAX_NAME_LENGTH } from '../lib/account';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].account;
+const p = t.profile;
+const tabs = [
+	{ id: 'account', label: p.tabAccount },
+	{ id: 'orders', label: p.tabOrders },
+	{ id: 'addresses', label: p.tabAddresses },
+];
+const formCopy = {
+	errors: t.errors,
+	soonNote: t.soonNote,
+	showPassword: t.showPassword,
+	hidePassword: t.hidePassword,
+};
+---
+
+<section class="section profile">
+	<div class="container">
+		<a class="back" href={getHomePath(locale)}>{t.back}</a>
+		<p class="eyebrow">{p.eyebrow}</p>
+		<h1 class="section-title">{p.title}</h1>
+		<p class="section-lead">{p.lead}</p>
+		<p class="soon">{t.soonNote}</p>
+
+		<div class="layout" id="profile-root">
+			<aside class="who">
+				<span class="avatar" aria-hidden="true">N</span>
+				<p class="name">{p.previewName}</p>
+				<p class="email">{p.previewEmail}</p>
+				<button type="button" class="button button--ghost logout" disabled>{p.logout}</button>
+			</aside>
+
+			<div>
+				<div class="tabs" role="tablist" aria-label={p.tabsLabel}>
+					{
+						tabs.map((tab, index) => (
+							<button
+								type="button"
+								role="tab"
+								id={`tab-${tab.id}`}
+								aria-controls={`panel-${tab.id}`}
+								aria-selected={index === 0 ? 'true' : 'false'}
+								tabindex={index === 0 ? 0 : -1}
+							>
+								{tab.label}
+							</button>
+						))
+					}
+				</div>
+
+				<section class="panel" role="tabpanel" id="panel-account" aria-labelledby="tab-account">
+					<form id="account-form" novalidate data-kind="profile" data-copy={JSON.stringify(formCopy)}>
+						<label>
+							{t.nameField}
+							<input type="text" name="name" autocomplete="name" maxlength={MAX_NAME_LENGTH} />
+						</label>
+						<label>
+							{t.emailField}
+							<input type="email" name="email" autocomplete="email" placeholder={p.previewEmail} readonly />
+							<small>{p.emailNote}</small>
+						</label>
+						<label>
+							{t.phoneField}
+							<input type="tel" name="phone" autocomplete="tel" inputmode="tel" />
+						</label>
+						<p class="form-status" data-status role="alert" aria-live="polite"></p>
+						<button class="button" type="submit">{p.save}</button>
+					</form>
+				</section>
+
+				<section class="panel" role="tabpanel" id="panel-orders" aria-labelledby="tab-orders" hidden>
+					<div class="empty">
+						<span class="empty-icon" aria-hidden="true">✂</span>
+						<h2>{p.ordersEmptyTitle}</h2>
+						<p>{p.ordersEmptyText}</p>
+						<a class="button" href={getCustomDesignPath(locale)}>{p.ordersCta}</a>
+					</div>
+				</section>
+
+				<section class="panel" role="tabpanel" id="panel-addresses" aria-labelledby="tab-addresses" hidden>
+					<div class="empty">
+						<span class="empty-icon" aria-hidden="true">⌂</span>
+						<h2>{p.addressesEmptyTitle}</h2>
+						<p>{p.addressesEmptyText}</p>
+						<button type="button" class="button button--ghost" disabled>{p.addAddress}</button>
+					</div>
+				</section>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { initAccountForm, initTabs } from '../lib/account-form';
+
+	const root = document.querySelector<HTMLElement>('#profile-root');
+	const form = document.querySelector<HTMLFormElement>('#account-form');
+
+	if (root) {
+		initTabs(root);
+	}
+
+	if (form) {
+		initAccountForm(form);
+	}
+</script>
+
+<style>
+	.back {
+		display: inline-block;
+		margin-bottom: 1.5rem;
+		padding: 0.35rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.back:hover {
+		background: var(--color-lilac);
+	}
+
+	.soon {
+		margin: 1.5rem 0 0;
+		padding: 0.7rem 0.9rem;
+		border: 1px dashed var(--color-line-strong);
+		border-radius: 10px;
+		background: var(--color-paper);
+		font-size: 0.9rem;
+	}
+
+	.layout {
+		display: grid;
+		grid-template-columns: 15rem minmax(0, 1fr);
+		gap: 2rem;
+		align-items: start;
+		margin-top: 2rem;
+	}
+
+	.who {
+		display: grid;
+		justify-items: center;
+		gap: 0.2rem;
+		padding: 1.5rem 1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 20px;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+		text-align: center;
+	}
+
+	.avatar {
+		display: grid;
+		place-items: center;
+		width: 4.5rem;
+		height: 4.5rem;
+		margin-bottom: 0.6rem;
+		border-radius: 50%;
+		background: var(--color-lilac-strong);
+		font-family: var(--font-display);
+		font-size: 1.8rem;
+		font-weight: 600;
+	}
+
+	.name {
+		margin: 0;
+		font-weight: 700;
+	}
+
+	.email {
+		margin: 0 0 1rem;
+		color: var(--color-ink-soft);
+		font-size: 0.88rem;
+		word-break: break-all;
+	}
+
+	.logout:disabled {
+		opacity: 0.55;
+		cursor: default;
+	}
+
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.tabs button {
+		padding: 0.45rem 1.1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		color: inherit;
+		font: inherit;
+		font-weight: 700;
+		cursor: pointer;
+		transition: background 0.15s;
+	}
+
+	.tabs button:hover {
+		background: var(--color-lilac);
+	}
+
+	.tabs button[aria-selected='true'] {
+		border-color: var(--color-lilac-strong);
+		background: var(--color-lilac-strong);
+	}
+
+	.panel {
+		padding: clamp(1.25rem, 4vw, 2rem);
+		border: 1px solid var(--color-line);
+		border-radius: 20px;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+	}
+
+	.panel[hidden] {
+		display: none;
+	}
+
+	form {
+		display: grid;
+		gap: 1rem;
+		max-width: 28rem;
+	}
+
+	label {
+		display: grid;
+		gap: 0.35rem;
+		font-size: 0.92rem;
+		font-weight: 600;
+	}
+
+	small {
+		color: var(--color-ink-soft);
+		font-weight: 400;
+	}
+
+	input {
+		width: 100%;
+		padding: 0.8rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 12px;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		font: inherit;
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+
+	input[readonly] {
+		background: var(--color-cream);
+		color: var(--color-ink-soft);
+	}
+
+	input:focus {
+		border-color: var(--color-thread);
+		box-shadow: 0 0 0 4px rgb(201 57 27 / 0.14);
+		outline: none;
+	}
+
+	.form-status {
+		min-height: 1.4em;
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.form-status:not(:empty) {
+		padding: 0.6rem 0.9rem;
+		border: 1px solid var(--color-thread);
+		border-radius: 10px;
+		background: #fff1ed;
+		color: var(--color-thread-dark);
+	}
+
+	.form-status[data-tone='note'] {
+		border-color: var(--color-line-strong);
+		background: var(--color-cream);
+		color: var(--color-ink);
+	}
+
+	.empty {
+		display: grid;
+		justify-items: center;
+		gap: 0.4rem;
+		padding: 2rem 1rem;
+		text-align: center;
+	}
+
+	.empty-icon {
+		display: grid;
+		place-items: center;
+		width: 4rem;
+		height: 4rem;
+		border-radius: 50%;
+		background: var(--color-mint);
+		font-size: 1.6rem;
+	}
+
+	.empty h2 {
+		margin: 0.6rem 0 0;
+		font-size: 1.5rem;
+	}
+
+	.empty p {
+		max-width: 34ch;
+		color: var(--color-ink-soft);
+	}
+
+	@media (max-width: 760px) {
+		.layout {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

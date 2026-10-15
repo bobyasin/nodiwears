@@ -6,8 +6,12 @@
   --color-thread: #c9391b;
   --color-thread-dark: #a82d14;
   --color-sun: #f0c24b;
+  /* the highlight under "işlenir" in the hero, as a solid colour: the sun yellow at 80% over the page */
+  --color-sun-soft: color-mix(in srgb, var(--color-sun) 80%, var(--color-cream));
   --color-lilac: #ece7f6;
   --color-mint: #e3f0e8;
+  --color-lilac-strong: #cdbff0;
+  --color-mint-strong: #b4dcc4;
   --color-pink: #f6e6ea;
   --color-line: #e6dece;
   --color-line-strong: #cfc4ae;

@@ -1,0 +1,57 @@
+---
+import type { Locale } from '../i18n/config';
+import { getHomePath, getPagePath, type PageId } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+	current: PageId;
+}
+
+const { locale, current } = Astro.props;
+const nav = ui[locale].nav;
+const tabs: { id: PageId; label: string }[] = [
+	{ id: 'about', label: nav.about },
+	{ id: 'whoWeAre', label: nav.whoWeAre },
+	{ id: 'certificates', label: nav.certificates },
+	{ id: 'contact', label: nav.contact },
+];
+---
+
+<nav class="tabs" aria-label={nav.corporateMenuLabel}>
+	<a class="home" href={getHomePath(locale)}>←</a>
+	{
+		tabs.map((tab) => (
+			<a href={getPagePath(locale, tab.id)} aria-current={tab.id === current ? 'page' : undefined}>
+				{tab.label}
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.tabs {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.tabs a {
+		padding: 0.4rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.tabs a:hover {
+		background: var(--color-lilac);
+	}
+
+	.tabs a[aria-current='page'] {
+		border-color: var(--color-lilac-strong);
+		background: var(--color-lilac-strong);
+	}
+</style>

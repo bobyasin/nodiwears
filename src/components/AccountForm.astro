@@ -1,0 +1,305 @@
+---
+import { getPolicyById } from '../data/policies';
+import type { Locale } from '../i18n/config';
+import { getHomePath, getPagePath, getPolicyPath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import { formatMessage } from '../lib/format';
+import { MAX_NAME_LENGTH, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from '../lib/account';
+
+interface Props {
+	locale: Locale;
+	kind: 'login' | 'register';
+}
+
+const { locale, kind } = Astro.props;
+const t = ui[locale].account;
+const copy = kind === 'login' ? t.login : t.register;
+const kvkk = getPolicyById(locale, 'kvkk');
+const privacyParts = t.register.privacy.split('{link}');
+const formCopy = {
+	errors: t.errors,
+	soonNote: t.soonNote,
+	showPassword: t.showPassword,
+	hidePassword: t.hidePassword,
+};
+---
+
+<section class="section auth">
+	<div class="container">
+		<a class="back" href={getHomePath(locale)}>{t.back}</a>
+
+		<div class="card">
+			<p class="eyebrow">{copy.eyebrow}</p>
+			<h1>{copy.title}</h1>
+			<p class="lead">{copy.lead}</p>
+
+			<form id="account-form" novalidate data-kind={kind} data-copy={JSON.stringify(formCopy)}>
+				{
+					kind === 'register' && (
+						<label>
+							{t.nameField}
+							<input type="text" name="name" autocomplete="name" maxlength={MAX_NAME_LENGTH} required />
+						</label>
+					)
+				}
+				<label>
+					{t.emailField}
+					<input type="email" name="email" autocomplete="email" required />
+				</label>
+				{
+					kind === 'register' && (
+						<label>
+							{t.phoneField}
+							<input type="tel" name="phone" autocomplete="tel" inputmode="tel" />
+						</label>
+					)
+				}
+				<label>
+					{t.passwordField}
+					<span class="password">
+						<input
+							type="password"
+							name="password"
+							autocomplete={kind === 'login' ? 'current-password' : 'new-password'}
+							maxlength={MAX_PASSWORD_LENGTH}
+							required
+						/>
+						<button type="button" class="toggle" data-toggle-password="password" aria-pressed="false">{t.showPassword}</button>
+					</span>
+					{kind === 'register' && <small>{formatMessage(t.passwordHint, { min: MIN_PASSWORD_LENGTH })}</small>}
+				</label>
+				{
+					kind === 'register' && (
+						<label>
+							{t.passwordRepeatField}
+							<span class="password">
+								<input type="password" name="passwordRepeat" autocomplete="new-password" maxlength={MAX_PASSWORD_LENGTH} required />
+								<button type="button" class="toggle" data-toggle-password="passwordRepeat" aria-pressed="false">
+									{t.showPassword}
+								</button>
+							</span>
+						</label>
+					)
+				}
+
+				{
+					kind === 'login' && (
+						<div class="row">
+							<label class="check">
+								<input type="checkbox" name="remember" />
+								<span>{t.login.remember}</span>
+							</label>
+							<button type="button" class="link-button" data-soon>{t.login.forgot}</button>
+						</div>
+					)
+				}
+
+				{
+					kind === 'register' && (
+						<>
+							<label class="check">
+								<input type="checkbox" name="privacy" />
+								<span>
+									{privacyParts[0]}
+									{kvkk ? <a href={getPolicyPath(locale, kvkk.slug)} target="_blank" rel="noopener">{t.register.privacyLink}</a> : t.register.privacyLink}
+									{privacyParts[1]}
+								</span>
+							</label>
+							<label class="check">
+								<input type="checkbox" name="marketing" />
+								<span>{t.register.marketing}</span>
+							</label>
+						</>
+					)
+				}
+
+				<p class="form-status" data-status role="alert" aria-live="polite"></p>
+				<button class="button" type="submit">{copy.submit}</button>
+			</form>
+
+			<p class="switch">
+				{kind === 'login' ? t.login.noAccount : t.register.haveAccount}
+				<a href={getPagePath(locale, kind === 'login' ? 'register' : 'login')}>
+					{kind === 'login' ? t.login.registerLink : t.register.loginLink}
+				</a>
+			</p>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { initAccountForm } from '../lib/account-form';
+
+	const form = document.querySelector<HTMLFormElement>('#account-form');
+
+	if (form) {
+		initAccountForm(form);
+	}
+</script>
+
+<style>
+	.container {
+		max-width: 520px;
+	}
+
+	.back {
+		display: inline-block;
+		margin-bottom: 1.5rem;
+		padding: 0.35rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.back:hover {
+		background: var(--color-lilac);
+	}
+
+	.card {
+		padding: clamp(1.4rem, 5vw, 2.4rem);
+		border: 1px solid var(--color-line);
+		border-radius: 22px;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+	}
+
+	h1 {
+		font-size: clamp(2rem, 6vw, 2.8rem);
+	}
+
+	.lead {
+		color: var(--color-ink-soft);
+	}
+
+	form {
+		display: grid;
+		gap: 1rem;
+		margin-top: 1.5rem;
+	}
+
+	label {
+		display: grid;
+		gap: 0.35rem;
+		font-size: 0.92rem;
+		font-weight: 600;
+	}
+
+	small {
+		color: var(--color-ink-soft);
+		font-weight: 400;
+	}
+
+	input[type='text'],
+	input[type='email'],
+	input[type='tel'],
+	input[type='password'] {
+		width: 100%;
+		padding: 0.8rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 12px;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		font: inherit;
+		transition: border-color 0.15s, box-shadow 0.15s;
+	}
+
+	input:focus {
+		border-color: var(--color-thread);
+		box-shadow: 0 0 0 4px rgb(201 57 27 / 0.14);
+		outline: none;
+	}
+
+	.password {
+		position: relative;
+		display: block;
+	}
+
+	.password input {
+		padding-right: 5rem;
+	}
+
+	.toggle {
+		position: absolute;
+		top: 50%;
+		right: 0.5rem;
+		translate: 0 -50%;
+		padding: 0.3rem 0.7rem;
+		border: 0;
+		border-radius: 999px;
+		background: var(--color-lilac);
+		color: var(--color-ink);
+		font: inherit;
+		font-size: 0.8rem;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	.check {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.6rem;
+		font-weight: 500;
+	}
+
+	.check input {
+		flex: none;
+		width: 1.1rem;
+		height: 1.1rem;
+		margin-top: 0.2rem;
+		accent-color: var(--color-ink);
+	}
+
+	.link-button {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--color-thread-dark);
+		font: inherit;
+		font-size: 0.9rem;
+		font-weight: 700;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	.form-status {
+		min-height: 1.4em;
+		margin: 0;
+		font-weight: 600;
+	}
+
+	.form-status:not(:empty) {
+		padding: 0.6rem 0.9rem;
+		border: 1px solid var(--color-thread);
+		border-radius: 10px;
+		background: #fff1ed;
+		color: var(--color-thread-dark);
+	}
+
+	.form-status[data-tone='note'] {
+		border-color: var(--color-line-strong);
+		background: var(--color-cream);
+		color: var(--color-ink);
+	}
+
+	.switch {
+		margin: 1.5rem 0 0;
+		color: var(--color-ink-soft);
+		text-align: center;
+	}
+
+	.switch a {
+		color: var(--color-ink);
+		font-weight: 700;
+	}
+</style>

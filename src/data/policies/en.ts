@@ -1,5 +1,5 @@
 import { CONSENT_STORAGE_KEY } from '../../lib/cookie-consent';
-import { siteConfig } from '../site';
+import { getContactLine, siteConfig } from '../site';
 import type { Policy } from './types';
 
 export const UPDATED_AT_EN = 'October 13, 2026';
@@ -17,7 +17,7 @@ export const policiesEn: readonly Policy[] = [
         heading: 'Data controller',
         paragraphs: [
           `Under Turkish Personal Data Protection Law No. 6698 ("KVKK"), your personal data is processed by ${controller} as described below.`,
-          `Contact: ${siteConfig.contactEmail} · ${siteConfig.contactPhone} · ${siteConfig.address.en}`,
+          `Contact: ${getContactLine('en')}`,
         ],
       },
       {

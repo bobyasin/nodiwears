@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { locales } from '../i18n/config';
 import { normalizeWhatsAppNumber } from '../lib/whatsapp';
-import { catalogTree, collectDesigns, flattenCatalog, getRelatedDesigns, siteConfig } from './site';
+import { catalogTree, collectDesigns, flattenCatalog, getContactLine, getRelatedDesigns, siteConfig } from './site';
 
 describe('catalog tree', () => {
   const nodes = flattenCatalog(catalogTree);
@@ -128,10 +128,15 @@ describe('site config', () => {
     expect(siteConfig.contactEmail).toMatch(/^[^\s@]+@[^\s@]+$/);
   });
 
-  it('should define an address in every language', () => {
-    for (const locale of locales) {
-      expect(siteConfig.address[locale].trim()).not.toBe('');
-    }
+  it('should keep the address either empty or filled in, in every language', () => {
+    const filled = locales.map((locale) => siteConfig.address[locale].trim() !== '');
+
+    expect(new Set(filled).size).toBe(1);
+  });
+
+  it('should not ship a placeholder phone number', () => {
+    // Empty is fine (it is then not shown); a number made only of zeros is a placeholder.
+    expect(siteConfig.contactPhone).not.toMatch(/^\+?[\s0()-]+$/);
   });
 });
 
@@ -141,6 +146,18 @@ describe('whatsapp number', () => {
 
     if (number !== '') {
       expect(normalizeWhatsAppNumber(number)).not.toBeNull();
+    }
+  });
+});
+
+describe('getContactLine', () => {
+  it('should always start with the email and leave out empty details', () => {
+    for (const locale of locales) {
+      const line = getContactLine(locale);
+
+      expect(line.startsWith(siteConfig.contactEmail)).toBe(true);
+      expect(line).not.toMatch(/·\s*(·|$)/);
+      expect(line).not.toContain('undefined');
     }
   });
 });

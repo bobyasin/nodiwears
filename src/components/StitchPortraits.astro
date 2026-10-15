@@ -1,0 +1,145 @@
+---
+import { Image } from 'astro:assets';
+import aycaPhoto from '../assets/team/ayca.jpeg';
+import burakPhoto from '../assets/team/burak.jpeg';
+import cifutPhoto from '../assets/team/cifut.jpeg';
+import caglaPhoto from '../assets/team/cagla.jpeg';
+import selcukPhoto from '../assets/team/selcuk.jpeg';
+import yasinPhoto from '../assets/team/yasin.jpeg';
+import type { Locale } from '../i18n/config';
+import { getPagePath } from '../i18n/paths';
+import { buildProductsQuery } from '../data/products';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].whoWeAre;
+// Stitched portraits, in the order the team is introduced; `shirt` is the colour of the shirt in the portrait.
+const people = [
+	{ name: 'Ayça', shirt: '#815989', role: t.person1Role, text: t.person1Text, photo: aycaPhoto },
+	{ name: 'Çağla', shirt: '#236445', role: t.person4Role, text: t.person4Text, photo: caglaPhoto },
+	{ name: 'Selçuk', shirt: '#871b1d', role: t.person3Role, text: t.person3Text, photo: selcukPhoto },
+	{ name: 'Burak', shirt: '#221e1a', role: t.person5Role, text: t.person5Text, photo: burakPhoto },
+	{ name: 'Yasin', shirt: '#c38820', role: t.person2Role, text: t.person2Text, photo: yasinPhoto },
+		{ name: 'Çifut', shirt: '#e8c547', role: t.person6Role, text: t.person6Text, photo: cifutPhoto, link: { label: t.person6Link, after: t.person6After, href: getPagePath(locale, 'products') + buildProductsQuery({ series: 'cifut' }) } },
+];
+---
+
+<ul class="team" aria-label={t.portraitsLabel}>
+	{
+		people.map((person) => (
+			<li style={`--shirt:${person.shirt}`}>
+				<span class="photo">
+					<Image src={person.photo} alt={person.name} width={480} height={480} />
+				</span>
+				<div class="bio">
+					<h3>{person.name}</h3>
+					<p class="role">{person.role}</p>
+					<p>{person.text}{person.link && <><a href={person.link.href}>{person.link.label}</a>{person.link.after}</>}</p>
+				</div>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.team {
+		display: grid;
+		gap: 1.5rem;
+		margin: 2rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: 10rem minmax(0, 1fr);
+		gap: 1.5rem 2rem;
+		align-items: center;
+		padding: 1.25rem 1.5rem;
+		border: 1px solid color-mix(in srgb, var(--shirt) 28%, var(--color-paper));
+		border-radius: 20px;
+		/* a soft tint of the shirt colour in the portrait */
+		background: color-mix(in srgb, var(--shirt) 14%, var(--color-paper));
+		box-shadow: var(--shadow);
+	}
+
+	/* The stitched artwork has white corners outside its gold ring; crop them away. */
+	.photo {
+		display: block;
+		width: 10rem;
+		aspect-ratio: 1;
+		overflow: hidden;
+		border-radius: 50%;
+		filter: drop-shadow(0 6px 10px rgb(33 26 56 / 0.15));
+		transition: rotate 0.3s var(--ease), scale 0.3s var(--ease);
+	}
+
+	.photo :global(img) {
+		display: block;
+		width: 110%;
+		height: 110%;
+		max-width: none;
+		margin: -5%;
+		object-fit: cover;
+	}
+
+	li:hover .photo {
+		rotate: -3deg;
+		scale: 1.04;
+	}
+
+	.bio a {
+		color: var(--color-thread-dark);
+		font-weight: 700;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1.6rem;
+	}
+
+	.role {
+		margin: 0.1rem 0 0.7rem;
+		color: var(--color-thread-dark);
+		font-size: 0.8rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.bio p:last-child {
+		margin: 0;
+		color: var(--color-ink-soft);
+		text-align: justify;
+		text-justify: inter-word;
+		text-wrap: wrap;
+		hyphens: auto;
+	}
+
+	@media (max-width: 640px) {
+		li {
+			grid-template-columns: 1fr;
+			justify-items: center;
+		}
+
+		h3,
+		.role {
+			text-align: center;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.photo {
+			transition: none;
+		}
+
+		li:hover .photo {
+			rotate: none;
+			scale: 1;
+		}
+	}
+</style>

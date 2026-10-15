@@ -46,7 +46,7 @@ Ad ≤ 100, mesaj ≤ 2000 karakter; e-posta `x@y.z` biçiminde olmalı.
 
 ## Edge Cases
 - Ad alanındaki satır sonları mailto konusuna taşınmaz (header injection önlemi); özel karakterler kodlanır.
-- JS kapalıysa form çalışmaz; tüm koleksiyonlar menüde listelenir, desen sayfaları çalışır (önizleme paneli görünmez; ilk koleksiyon açık, diğerleri tarayıcının yerel `<details>` davranışıyla açılır); e-posta ve telefon görünür.
+- JS kapalıysa form çalışmaz; tüm koleksiyonlar menüde listelenir, desen sayfaları çalışır (önizleme paneli görünmez; ilk koleksiyon açık, diğerleri tarayıcının yerel `<details>` davranışıyla açılır); e-posta görünür (telefon ve adres doldurulmuşsa onlar da).
 - Türkçe karakterli desen adları (ör. "Anka kuşu") URL'de ASCII olur (`anka-kusu`).
 
 ## Security Considerations
@@ -73,7 +73,7 @@ Yok: projede tarayıcı test altyapısı bulunmuyor. Eklenirse: katalog menüsü
 `npm run build` ve `npm test` başarılı; QA senaryoları geçer; yatay kaydırma olmaz.
 
 ## Deployment / Migration Considerations
-Statik `dist/` herhangi bir statik barındırmaya yüklenebilir. Yayın öncesi `site.ts` içindeki e-posta/telefon gerçek değerlerle değiştirilmeli.
+Statik `dist/` herhangi bir statik barındırmaya yüklenebilir. Yayın öncesi `site.ts` içindeki e-posta ile telefon ve adres gerçek değerlerle doldurulmalı. Telefon ve adres şimdilik boştur; boş değerler İletişim bölümünde ve KVKK metnindeki iletişim satırında hiç gösterilmez (`getContactLine`), dolduruldukları anda görünür.
 
 ## Known Limitations
 - WhatsApp: `siteConfig.whatsappNumber` (`src/data/site.ts`) boş olduğu sürece her sayfada sağ altta pasif "WhatsApp · Yakında" düğmesi (telefonda yalnızca simge) ve iletişim bölümünde "Yakında" kartı görünür; hiçbir yere yönlendirmez. Numara girilince (`+90 532 123 45 67` gibi) aynı yerler gerçek bağlantıya dönüşür ve `wa.me` ile sohbeti açar. Desen sayfasında mesaj o desenle önceden doldurulur, diğer sayfalarda genel bir selamlama gelir. Numara geçersizse (boş, yer tutucu, çok kısa) düğme pasif kalır. WhatsApp kullanımı kişisel veriyi Meta'ya aktarır; yayına almadan önce gizlilik/KVKK metnine bir cümle eklenmesi önerilir.

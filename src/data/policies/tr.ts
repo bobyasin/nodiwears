@@ -1,5 +1,5 @@
 import { CONSENT_STORAGE_KEY } from '../../lib/cookie-consent';
-import { siteConfig } from '../site';
+import { getContactLine, siteConfig } from '../site';
 import type { Policy } from './types';
 
 export const UPDATED_AT_TR = '13 Ekim 2026';
@@ -17,7 +17,7 @@ export const policiesTr: readonly Policy[] = [
         heading: 'Veri sorumlusu',
         paragraphs: [
           `6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca kişisel verileriniz, veri sorumlusu sıfatıyla ${controller} tarafından aşağıda açıklanan kapsamda işlenmektedir.`,
-          `İletişim: ${siteConfig.contactEmail} · ${siteConfig.contactPhone} · ${siteConfig.address.tr}`,
+          `İletişim: ${getContactLine('tr')}`,
         ],
       },
       {

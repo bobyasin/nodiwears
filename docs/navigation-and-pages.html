@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Menüler, Ürünler ve Kurumsal Sayfalar - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Menüler, Ürünler ve Kurumsal Sayfalar</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Amaç</h2>
+<p>Ziyaretçi ürün tiplerine kategoriden ulaşabilsin, markayı tanıyabilsin ve iletişime kolayca geçebilsin.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li><b>Üst menü (soldan sağa):</b> Kurumsal ▾ · Katalog · Ürünler ▾ · İletişim (ana sayfadaki iletişim bölümüne gider) · Sipariş ver düğmesi · TR/EN · Giriş yap. Özel tasarım sayfasına ana sayfadaki "Özel tasarım iste" ve ürün kartlarındaki düğmelerden ulaşılır.</li>
+  <li><b>Ürünler menüsü:</b> üzerine gelince açılır. Solda Erkek, Kadın, Unisex, Aksesuar; bir kategoriye gelince sağda ürün tipleri ve "Hepsini gör" görünür. Bir seçeneğe basınca Ürünler sayfası o seçimle açılır.</li>
+  <li><b>Kategori ve tipler:</b> Erkek/Kadın: tişört, gömlek, hoodie, şort · Unisex: tişört, hoodie · Aksesuar: şapka, buf, çorap.</li>
+  <li><b>Ürünler sayfası:</b> kategori ve tip düğmeleriyle süzülür; her kartta ürün resmi, adı ve "Özel tasarım iste" düğmesi vardır. Düğme, özel tasarım sayfasını o ürün seçili olarak ve 2. adımdan açar.</li>
+  <li><b>Kurumsal menüsü:</b> Hakkımızda, Biz kimiz, Belgelerimiz. İletişim ayrı bir menü bağlantısıdır. Kurumsal sayfaların ve İletişim sayfasının üstünde aynı geçiş sekmeleri (Hakkımızda, Biz kimiz, Belgelerimiz, İletişim) görünür; İletişim'e geçince sekmeler kaybolmaz.</li>
+  <li><b>Sipariş ver</b> düğmesi Ürünler sayfasına götürür; ürün tipini seçip karttaki "Özel tasarım iste" ile sipariş başlatılır.</li>
+  <li>Üst menünün arka planı sarıdır; ana sayfadaki "işlenir" kelimesinin altındaki vurgu sarısıyla birebir aynı tondur.</li>
+  <li>Telefonda menüler üstteki üç çizgi düğmesinin içinde, alt alta açılır.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<ul>
+  <li>Ürünler sayfası stoklu ürün değil, nakışa hazır ürün tiplerini gösterir; fiyat ve stok yoktur.</li>
+  <li>Aksesuar kategorisinde yalnızca şapka, buf ve çorap vardır.</li>
+  <li>Hakkımızda ve Biz kimiz metinleri şimdilik taslaktır; Belgelerimiz'deki belgeler "Yakında yüklenecek" olarak görünür.</li>
+  <li><b>Biz kimiz</b> sayfasında önce markanın hikâyesi iki paragrafla anlatılır (15 yılı aşkın dostluk, beş arkadaş, büyüyen Nodi ekosistemi). Altında beş kişi alt alta kartlarla tanıtılır: solda nakışla işlenmiş sembolik portre, sağda ad, çalışma alanı ve kısa yazı; kartın arka planı kişinin portredeki tişört renginin yumuşak tonudur (Ayça mor, Çağla yeşil, Selçuk bordo, Burak antrasit, Yasin hardal). Sıra: Ayça, Çağla, Selçuk, Burak, Yasin. Yazılar iki yana yaslıdır. Telefonda resim üstte, yazı altta görünür.</li>
+</ul>
+
+<h2>Hata durumları ve sınır durumlar</h2>
+<table>
+  <tr><th>Durum</th><th>Ne olur</th></tr>
+  <tr><td>Adresteki kategori/tip geçersiz</td><td>Tüm ürünler gösterilir.</td></tr>
+  <tr><td>Kategoride olmayan tip (ör. Unisex + çorap)</td><td>Tip yok sayılır, kategorinin tüm ürünleri gösterilir.</td></tr>
+  <tr><td>Menüden fareyle çıkıp geri dönmek</td><td>Kısa gecikme sayesinde menü titremez.</td></tr>
+  <tr><td>Dokunmatik ekran</td><td>Hover yoktur; menü başlığına dokunarak açılır.</td></tr>
+  <tr><td>JavaScript kapalı</td><td>Ürünler sayfasında tüm kartlar görünür; masaüstü menüleri üzerine gelince açılır.</td></tr>
+</table>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Üst menüde "Ürünler"in üzerine gel</td><td>Menü açılır: Erkek, Kadın, Unisex, Aksesuar.</td></tr>
+  <tr><td>2</td><td>Sırayla her kategoriye gel</td><td>Sağda o kategorinin tipleri ve "Hepsini gör" görünür.</td></tr>
+  <tr><td>3</td><td>Erkek &gt; Hoodie'ye bas</td><td>Ürünler sayfası açılır; yalnızca Erkek Hoodie görünür; "Erkek" ve "Hoodie" seçili.</td></tr>
+  <tr><td>4</td><td>Kadın &gt; Hepsini gör</td><td>Kadın ürünlerinin tamamı (4 kart) görünür.</td></tr>
+  <tr><td>5</td><td>Aksesuar'a bas, sonra tip düğmelerini dene</td><td>Şapka, buf, çorap süzülür; sayı yazısı güncellenir.</td></tr>
+  <tr><td>6</td><td>Süzdükten sonra tarayıcının geri düğmesine bas</td><td>Önceki süzüm geri gelir.</td></tr>
+  <tr><td>7</td><td>Karttan "Özel tasarım iste"ye bas</td><td>Özel tasarım sayfası o ürün seçili, 2. adımdan açılır.</td></tr>
+  <tr><td>8</td><td>Menü açıkken Esc'ye bas / boş bir yere tıkla</td><td>Menü kapanır.</td></tr>
+  <tr><td>9</td><td>"Kurumsal"ın altından her sayfaya git; sonra "İletişim"e bas</td><td>Hakkımızda, Biz kimiz, Belgelerimiz açılır; İletişim sayfası ayrı bağlantıyla açılır.</td></tr>
+  <tr><td>9a</td><td>Biz kimiz sayfası</td><td>"Biz Kimiz?" başlığı ve iki giriş paragrafı; altında beş kart (resim solda, yazı sağda) alt alta, belirtilen sırayla görünür.</td></tr>
+  <tr><td>10</td><td>Belgelerimiz sayfası</td><td>Belge yer tutucuları ve üç politika bağlantısı (KVKK, gizlilik, çerez) görünür.</td></tr>
+  <tr><td>11</td><td>İletişim sayfası</td><td>E-posta, telefon, WhatsApp ve form görünür; form çalışır.</td></tr>
+  <tr><td>12</td><td>"Sipariş ver"e bas</td><td>Ürünler sayfası açılır (tüm ürünler görünür).</td></tr>
+  <tr><td>13</td><td>Telefon genişliğinde menü</td><td>Hamburger içinde Ürünler ve Kurumsal alt alta açılır, taşma yok.</td></tr>
+  <tr><td>14</td><td>EN'e geç</td><td>Tüm menü ve sayfalar İngilizce, adresler /en/ altında.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Ürünler ve Kurumsal açılır menüleri çalışır; ürün tipine en çok iki tıkla ulaşılır.</li>
+  <li>Ürünler sayfası adresteki seçimle süzülür ve özel tasarıma ürünle yönlendirir.</li>
+  <li>Kurumsal ve İletişim sayfaları iki dilde açılır.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-15</td><td>Çifut Serisi kartları hazır ürün fotoğraflarını (büyük) ve nakışa yakınlaştırılmış küçük görseli kullanır.</td></tr>
+  <tr><td>2026-10-15</td><td>Çifut Serisi kartlarında tasarım ürün üzerinde gösterilir.</td></tr>
+  <tr><td>2026-10-15</td><td>Çifut Serisi: tişört, gömlek, kapüşonlu, şapka ve çorap kartları, her biri kendi nakış görseliyle.</td></tr>
+  <tr><td>2026-10-15</td><td>Çifut Serisi Ürünler menüsüne eklendi.</td></tr>
+  <tr><td>2026-10-15</td><td>Çifut'un yazısındaki "buradan" bağlantısı Ürünler sayfasındaki Çifut Serisi'ni açar; Ürünler sayfasına "Özel seriler" filtresi eklendi.</td></tr>
+  <tr><td>2026-10-15</td><td>Ekibin grup görseli Biz kimiz sayfasından kaldırıldı.</td></tr>
+  <tr><td>2026-10-15</td><td>Biz kimiz kartlarının arka planı her kişinin tişört renginin yumuşak tonuyla boyandı.</td></tr>
+  <tr><td>2026-10-15</td><td>Selçuk'un portresi yeni görselle güncellendi.</td></tr>
+  <tr><td>2026-10-15</td><td>Çağla'nın portresi yeni görselle güncellendi.</td></tr>
+  <tr><td>2026-10-15</td><td>Burak'ın portresi de hazır nakış görseliyle değiştirildi; beş portre de hazır görseldir.</td></tr>
+  <tr><td>2026-10-15</td><td>Yasin ve Selçuk'un portreleri hazır nakış görselleriyle değiştirildi.</td></tr>
+  <tr><td>2026-10-15</td><td>Biz kimiz yazıları iki yana yaslı yapıldı.</td></tr>
+  <tr><td>2026-10-15</td><td>Üst menüdeki İletişim ana sayfadaki iletişim bölümüne gider; ekip sırası Ayça, Çağla, Selçuk, Burak, Yasin oldu.</td></tr>
+  <tr><td>2026-10-15</td><td>Çağla'nın saçı düz ve salma (tek parça); Ayça'nın saçı hafif dalgalı.</td></tr>
+  <tr><td>2026-10-15</td><td>Çağla'nın saçı yeniden çizildi (başörtüsü gibi görünmüyor).</td></tr>
+  <tr><td>2026-10-15</td><td>Burak ve Selçuk'un saçı kısaltıldı, dalgalandı; Ayça'nın saçı kıvırcık yapıldı.</td></tr>
+  <tr><td>2026-10-15</td><td>Menü sırası Kurumsal, Katalog, Ürünler, İletişim oldu; Özel tasarım menüden çıkarıldı.</td></tr>
+  <tr><td>2026-10-15</td><td>Portreler iki satıra bölündü; Selçuk ve Burak'ın saçı yukarı dalgalı; header arka planı sarı yapıldı.</td></tr>
+  <tr><td>2026-10-15</td><td>Biz kimiz sayfasına 5 sembolik nakış portresi eklendi (rolsüz, adlarla).</td></tr>
+  <tr><td>2026-10-15</td><td>İlk sürüm: menüler, ürünler sayfası, kurumsal sayfalar, iletişim sayfası.</td></tr>
+</table>
+</body>
+</html>
