@@ -525,6 +525,11 @@ const switcher = locales.map((code) => ({
 			border-bottom: 1px solid var(--color-line);
 			background: var(--color-sun-soft);
 			box-shadow: 0 16px 28px rgb(33 26 56 / 0.1);
+			/* the open menu can be taller than the screen: keep it inside and let it scroll on its own */
+			max-height: calc(100vh - 4.5rem);
+			max-height: calc(100dvh - 4.5rem);
+			overflow-y: auto;
+			overscroll-behavior: contain;
 		}
 
 		.nav.is-open {
