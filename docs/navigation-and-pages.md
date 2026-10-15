@@ -89,6 +89,7 @@ Statik; ek yapılandırma yok. Eski `/#iletisim` bağlantıları çalışmaya de
 - Hakkımızda / Biz kimiz metinleri taslaktır; marka ve gerçek ekip bilgisiyle güncellenmelidir. Belgeler yer tutucudur.
 
 ## Change History
+- 2026-10-15: Mobilde açılan menü ekrandan uzunsa kendi içinde kaydırılır (yükseklik ekranla sınırlı); önceden alt kısım (Unisex'ten sonrası) ekran dışında kalıyor ve menü kaydırılamıyordu.
 - 2026-10-15: Çifut Serisi kartları artık hazır ürün fotoğraflarını kullanır (`src/assets/series/cifut/*.png`: tişört, gömlek, kapüşonlu, şapka, çorap); büyük görsel ürün fotoğrafı, köşedeki küçük yuvarlak görsel aynı fotoğrafın nakış üzerine yakınlaştırılmış hali. Önceki silüet üstü rozet gösterimi kaldırıldı.
 - 2026-10-15: Çifut Serisi kartlarında tasarım artık ürün silueti üzerinde gösterilir (konum ve boyut ürünün baskı kurallarından: ilk konum, "büyük" ya da "orta" ebat); düz görsel köşede küçük rozet olarak kalır.
 - 2026-10-15: Çifut Serisi ürün tipleri tişört, gömlek, kapüşonlu, şapka ve çorap oldu; her birinin nakış görseli `src/assets/series/cifut/` altından Ürünler sayfasındaki seri kartında gösterilir.
