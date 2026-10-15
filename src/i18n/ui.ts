@@ -40,6 +40,13 @@ const tr = {
     previewLabel: 'Seçili desen görselleri',
     slide: 'Görsel {n}',
   },
+  whatsapp: {
+    label: 'WhatsApp ile yazın',
+    short: 'WhatsApp',
+    soon: 'Yakında',
+    soonLabel: 'WhatsApp desteği yakında',
+    message: 'Merhaba, nodiwears ürünleri hakkında bilgi almak istiyorum.',
+  },
   contact: {
     title: 'Bize yazın',
     email: 'E-posta:',
@@ -141,6 +148,13 @@ const en: typeof tr = {
     view: 'View',
     previewLabel: 'Selected design images',
     slide: 'Image {n}',
+  },
+  whatsapp: {
+    label: 'Message us on WhatsApp',
+    short: 'WhatsApp',
+    soon: 'Coming soon',
+    soonLabel: 'WhatsApp support is coming soon',
+    message: 'Hello, I would like to know more about nodiwears products.',
   },
   contact: {
     title: 'Write to us',

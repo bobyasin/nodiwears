@@ -5,6 +5,7 @@ import { getPolicyPath } from '../i18n/paths';
 import { getPolicyById } from '../data/policies';
 import { ui } from '../i18n/ui';
 import { MAX_MESSAGE_LENGTH, MAX_NAME_LENGTH } from '../lib/contact';
+import { buildWhatsAppUrl } from '../lib/whatsapp';
 
 interface Props {
 	locale: Locale;
@@ -14,6 +15,7 @@ interface Props {
 const { locale, defaultMessage = '' } = Astro.props;
 const t = ui[locale].contact;
 const kvkk = getPolicyById(locale, 'kvkk');
+const whatsappUrl = buildWhatsAppUrl(siteConfig.whatsappNumber, defaultMessage || ui[locale].whatsapp.message);
 const mailCopy = { subject: t.mailSubject, nameLabel: t.mailNameLabel, emailLabel: t.mailEmailLabel };
 ---
 
@@ -24,6 +26,18 @@ const mailCopy = { subject: t.mailSubject, nameLabel: t.mailNameLabel, emailLabe
 			<ul class="info">
 				<li><strong>{t.email}</strong> <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a></li>
 				<li><strong>{t.phone}</strong> {siteConfig.contactPhone}</li>
+				<li class="whatsapp-card">
+					<strong>{ui[locale].whatsapp.short}</strong>
+					{
+						whatsappUrl ? (
+							<a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+								{ui[locale].whatsapp.label}
+							</a>
+						) : (
+							<span>{ui[locale].whatsapp.soon}</span>
+						)
+					}
+				</li>
 			</ul>
 		</div>
 

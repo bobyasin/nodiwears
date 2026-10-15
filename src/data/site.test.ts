@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { locales } from '../i18n/config';
+import { normalizeWhatsAppNumber } from '../lib/whatsapp';
 import { catalogTree, collectDesigns, flattenCatalog, getRelatedDesigns, siteConfig } from './site';
 
 describe('catalog tree', () => {
@@ -130,6 +131,16 @@ describe('site config', () => {
   it('should define an address in every language', () => {
     for (const locale of locales) {
       expect(siteConfig.address[locale].trim()).not.toBe('');
+    }
+  });
+});
+
+describe('whatsapp number', () => {
+  it('should be empty or a usable number, so a typo cannot silently hide the buttons', () => {
+    const number = siteConfig.whatsappNumber.trim();
+
+    if (number !== '') {
+      expect(normalizeWhatsAppNumber(number)).not.toBeNull();
     }
   });
 });
