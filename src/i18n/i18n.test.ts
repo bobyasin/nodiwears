@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { getOtherLocale, isLocale, locales } from './config';
-import { getDesignPath, getHomePath, getPolicyPath, getSectionPath } from './paths';
+import { PAGE_SLUGS, getCustomDesignPath, getPagePath, getDesignPath, getHomePath, getPolicyPath, getSectionPath } from './paths';
 import { getDesignStaticPaths, getPolicyStaticPaths } from './static-paths';
 import { ui } from './ui';
 
@@ -78,6 +78,28 @@ describe('paths', () => {
     expect(getDesignPath('en', 'mitoloji-medusa')).toBe('/en/catalog/mitoloji-medusa/');
     expect(getPolicyPath('tr', 'cerez-politikasi')).toBe('/politikalar/cerez-politikasi/');
     expect(getPolicyPath('en', 'cookie-policy')).toBe('/en/policies/cookie-policy/');
+  });
+
+  it('should localize the custom design page', () => {
+    expect(getCustomDesignPath('tr')).toBe('/ozel-tasarim/');
+    expect(getCustomDesignPath('en')).toBe('/en/custom-design/');
+  });
+
+  it('should localize every standalone page', () => {
+    expect(getPagePath('tr', 'products')).toBe('/urunler/');
+    expect(getPagePath('en', 'products')).toBe('/en/products/');
+    expect(getPagePath('tr', 'about')).toBe('/kurumsal/hakkimizda/');
+    expect(getPagePath('en', 'certificates')).toBe('/en/corporate/certificates/');
+    expect(getPagePath('tr', 'login')).toBe('/giris/');
+    expect(getPagePath('en', 'profile')).toBe('/en/profile/');
+  });
+
+  it('should give every standalone page a distinct address in each language', () => {
+    for (const locale of ['tr', 'en'] as const) {
+      const slugs = Object.values(PAGE_SLUGS).map((slug) => slug[locale]);
+
+      expect(new Set(slugs).size).toBe(slugs.length);
+    }
   });
 });
 

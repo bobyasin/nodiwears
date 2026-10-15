@@ -20,11 +20,22 @@ export const siteConfig = {
   name: 'nodiwears',
   url: 'https://www.nodiwears.com',
   contactEmail: 'merhaba@nodiwears.com',
-  contactPhone: '+90 000 000 00 00',
+  // Left empty until real contact details exist; empty values are simply not shown anywhere on the site.
+  contactPhone: '' as string,
   // WhatsApp number, e.g. '+90 532 123 45 67'. While empty (or a placeholder) the WhatsApp buttons show as "coming soon" and do not open anything.
   whatsappNumber: '',
-  address: { tr: 'Adres bilgisi yakında', en: 'Address coming soon' } satisfies Localized<string>,
+  // Endpoint that receives custom design orders (multipart POST, see docs/custom-design.md). While empty the order form works as a preview and does not send anything.
+  customOrderEndpoint: '',
+  address: { tr: '', en: '' } satisfies Localized<string>,
 } as const;
+
+/** Email, phone and address joined with dots, leaving out whatever is not filled in yet. */
+export function getContactLine(locale: Locale): string {
+  return [siteConfig.contactEmail, siteConfig.contactPhone, siteConfig.address[locale]]
+    .map((part) => part.trim())
+    .filter((part) => part !== '')
+    .join(' · ');
+}
 
 // Design ids are derived from the Turkish title so URLs stay stable across languages.
 const leaves = (prefix: string, designs: readonly Localized<string>[]): CatalogNode[] =>

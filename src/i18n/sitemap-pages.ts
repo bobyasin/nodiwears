@@ -1,7 +1,10 @@
 import { getPolicies, getPolicyById } from '../data/policies';
 import { catalogTree, collectDesigns } from '../data/site';
 import type { PagePaths } from '../lib/sitemap';
-import { getDesignPath, getHomePath, getPolicyPath } from './paths';
+import { getDesignPath, getHomePath, getPagePath, getPolicyPath, type PageId } from './paths';
+
+/** Public standalone pages; login, register and profile are left out (noindex). */
+const LISTED_PAGES: readonly PageId[] = ['customDesign', 'products', 'about', 'whoWeAre', 'certificates', 'contact'];
 
 export function getSitemapPages(): PagePaths[] {
   const designs = collectDesigns(catalogTree, 'tr').map(
@@ -14,5 +17,10 @@ export function getSitemapPages(): PagePaths[] {
     }),
   );
 
-  return [{ tr: getHomePath('tr'), en: getHomePath('en') }, ...designs, ...policies];
+  return [
+    { tr: getHomePath('tr'), en: getHomePath('en') },
+    ...LISTED_PAGES.map((page): PagePaths => ({ tr: getPagePath('tr', page), en: getPagePath('en', page) })),
+    ...designs,
+    ...policies,
+  ];
 }

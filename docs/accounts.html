@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hesap: Giriş, Kayıt, Profil - İş / QA Dokümanı</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1.25rem; line-height: 1.6; color: #2d1f4d; }
+  h2 { margin-top: 2rem; border-bottom: 2px solid #cdb8ff; padding-bottom: .3rem; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #cdb8ff; padding: .5rem .7rem; text-align: left; vertical-align: top; }
+  th { background: #f4eeff; }
+</style>
+</head>
+<body>
+<h1>Hesap: Giriş, Kayıt ve Profil</h1>
+<p>Bu doküman iş ve QA ekipleri içindir; teknik bilgi gerektirmez.</p>
+
+<h2>Önemli not</h2>
+<p>Hesap hizmetinin arka ucu <b>henüz yok</b>. Bu çalışma yalnızca sayfaların tasarımıdır: formlar alanları kontrol eder ama hiçbir bilgiyi göndermez, kimse giriş yapamaz. Geçerli bir form gönderilince ekranda "Hesap hizmeti henüz aktif değil" notu çıkar.</p>
+
+<h2>Beklenen davranış</h2>
+<ul>
+  <li>Üst menüde "Giriş yap" bağlantısı vardır (telefonda yalnızca kişi simgesi).</li>
+  <li><b>Giriş sayfası:</b> e-posta, şifre (Göster/Gizle), "Beni hatırla", "Şifremi unuttum", "Hesabın yok mu? Kayıt ol".</li>
+  <li><b>Kayıt sayfası:</b> ad soyad, e-posta, telefon (isteğe bağlı), şifre ve şifre tekrarı, KVKK onayı (zorunlu), kampanya e-postası (isteğe bağlı), "Zaten hesabın var mı? Giriş yap".</li>
+  <li><b>Profil sayfası:</b> solda ad/e-posta özeti ve "Çıkış yap"; sağda üç sekme: Hesap bilgileri, Siparişlerim, Adreslerim. Siparişler ve adresler henüz boştur ve "Özel tasarım iste" / "Adres ekle" ile yönlendirir.</li>
+  <li>Sayfalar Türkçe (/giris, /kayit, /profil) ve İngilizce (/en/login, /en/register, /en/profile) açılır.</li>
+</ul>
+
+<h2>İş kuralları</h2>
+<table>
+  <tr><th>Alan</th><th>Kural</th></tr>
+  <tr><td>E-posta</td><td>Geçerli bir e-posta adresi olmalı.</td></tr>
+  <tr><td>Şifre</td><td>En az 8, en çok 72 karakter; kayıtta tekrarıyla aynı olmalı.</td></tr>
+  <tr><td>Ad soyad</td><td>Boş olamaz; en fazla 100 karakter.</td></tr>
+  <tr><td>Telefon</td><td>İsteğe bağlı; yazılırsa 10–15 haneli geçerli bir numara olmalı (+90 532 123 45 67 gibi).</td></tr>
+  <tr><td>KVKK onayı</td><td>Kayıtta işaretlenmeden devam edilemez.</td></tr>
+  <tr><td>E-posta (profilde)</td><td>Değiştirilemez.</td></tr>
+</table>
+
+<h2>Hata durumları</h2>
+<table>
+  <tr><th>Durum</th><th>Ziyaretçi ne görür</th></tr>
+  <tr><td>Boş ya da geçersiz e-posta</td><td>"Lütfen geçerli bir e-posta adresi yazın."</td></tr>
+  <tr><td>Boş şifre</td><td>"Lütfen şifrenizi yazın."</td></tr>
+  <tr><td>8 karakterden kısa şifre</td><td>"Şifre en az 8 karakter olmalı."</td></tr>
+  <tr><td>Şifreler farklı</td><td>"Şifreler eşleşmiyor."</td></tr>
+  <tr><td>Geçersiz telefon</td><td>"Lütfen geçerli bir telefon numarası yazın."</td></tr>
+  <tr><td>KVKK onaysız kayıt</td><td>"Devam etmek için aydınlatma metnini kabul etmelisiniz."</td></tr>
+  <tr><td>Hepsi doğruyken gönder</td><td>"Hesap hizmeti henüz aktif değil…" notu; hiçbir bilgi gönderilmez.</td></tr>
+</table>
+
+<h2>Sınır durumlar</h2>
+<ul>
+  <li>Telefon boş bırakılabilir.</li>
+  <li>Şifrenin başındaki/sonundaki boşluk şifrenin parçası sayılır; e-posta ve ad boşluklardan arındırılır.</li>
+  <li>Şifre göster/gizle düğmesi ekran okuyuculara basılı/basılı değil olarak bildirilir.</li>
+  <li>Bu üç sayfa arama motorlarına kapalıdır ve site haritasında yoktur.</li>
+</ul>
+
+<h2>QA test senaryoları</h2>
+<table>
+  <tr><th>#</th><th>Senaryo</th><th>Beklenen sonuç</th></tr>
+  <tr><td>1</td><td>Üst menüde "Giriş yap"a bas</td><td>Giriş sayfası açılır.</td></tr>
+  <tr><td>2</td><td>Boş formu gönder</td><td>E-posta ve şifre uyarıları çıkar.</td></tr>
+  <tr><td>3</td><td>Geçerli e-posta + şifre yaz, gönder</td><td>"Hesap hizmeti henüz aktif değil" notu görünür.</td></tr>
+  <tr><td>4</td><td>"Göster"e bas</td><td>Şifre görünür, düğme "Gizle" olur; tekrar basınca gizlenir.</td></tr>
+  <tr><td>5</td><td>"Kayıt ol"a bas</td><td>Kayıt sayfası açılır.</td></tr>
+  <tr><td>6</td><td>Kayıtta boş gönder</td><td>Ad, e-posta, şifre ve KVKK uyarıları çıkar.</td></tr>
+  <tr><td>7</td><td>Kısa şifre / farklı tekrar dene</td><td>İlgili uyarı çıkar.</td></tr>
+  <tr><td>8</td><td>Telefona "abc" yaz</td><td>Telefon uyarısı; boş bırakınca uyarı yok.</td></tr>
+  <tr><td>9</td><td>Her şeyi doğru doldur, KVKK'yı işaretle, gönder</td><td>"Hesap hizmeti henüz aktif değil" notu.</td></tr>
+  <tr><td>10</td><td>KVKK bağlantısına bas</td><td>Aydınlatma metni yeni sekmede açılır.</td></tr>
+  <tr><td>11</td><td>Profil sayfasında sekmeleri gez (tık ve ←/→)</td><td>Hesap bilgileri, Siparişlerim, Adreslerim sırayla görünür.</td></tr>
+  <tr><td>12</td><td>Siparişlerim'de "Özel tasarım iste"</td><td>Özel tasarım sayfası açılır.</td></tr>
+  <tr><td>13</td><td>İngilizce sayfaları aç</td><td>Tüm metin ve uyarılar İngilizce.</td></tr>
+  <tr><td>14</td><td>Telefon genişliğinde aç</td><td>Kartlar tek sütun, taşma yok.</td></tr>
+</table>
+
+<h2>Kabul kriterleri</h2>
+<ul>
+  <li>Üç sayfa iki dilde açılır; üst menüden girişe ulaşılır.</li>
+  <li>Hatalı alanlar doğru mesajla reddedilir; geçerli formda "hizmet aktif değil" notu çıkar ve hiçbir veri gönderilmez.</li>
+  <li>Profil sekmeleri çalışır.</li>
+</ul>
+
+<h2>Değişiklik geçmişi</h2>
+<table>
+  <tr><th>Tarih</th><th>Değişiklik</th></tr>
+  <tr><td>2026-10-15</td><td>İlk sürüm: giriş, kayıt ve profil arayüzleri ve doğrulama (arka uç yok).</td></tr>
+</table>
+</body>
+</html>

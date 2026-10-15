@@ -2,7 +2,7 @@
 import { getPolicies } from '../data/policies';
 import { siteConfig } from '../data/site';
 import type { Locale } from '../i18n/config';
-import { getPolicyPath, getSectionPath } from '../i18n/paths';
+import { getCustomDesignPath, getPagePath, getPolicyPath, getSectionPath } from '../i18n/paths';
 import { ui } from '../i18n/ui';
 import { formatMessage } from '../lib/format';
 
@@ -13,8 +13,13 @@ interface Props {
 const { locale } = Astro.props;
 const t = ui[locale];
 const links = [
+	{ label: t.nav.products, href: getPagePath(locale, 'products') },
 	{ label: t.nav.catalog, href: getSectionPath(locale, 'katalog') },
-	{ label: t.nav.contact, href: getSectionPath(locale, 'iletisim') },
+	{ label: t.nav.custom, href: getCustomDesignPath(locale) },
+	{ label: t.nav.about, href: getPagePath(locale, 'about') },
+	{ label: t.nav.whoWeAre, href: getPagePath(locale, 'whoWeAre') },
+	{ label: t.nav.certificates, href: getPagePath(locale, 'certificates') },
+	{ label: t.nav.contact, href: getPagePath(locale, 'contact') },
 ];
 const rights = formatMessage(t.footer.rights, { year: new Date().getFullYear(), name: siteConfig.name });
 ---
@@ -53,7 +58,6 @@ const rights = formatMessage(t.footer.rights, { year: new Date().getFullYear(), 
 
 <style>
 	.footer {
-		margin-top: 3rem;
 		padding-block: 3rem 2rem;
 		border-top: 0;
 		background: var(--color-ink);

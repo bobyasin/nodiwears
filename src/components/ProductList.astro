@@ -1,0 +1,363 @@
+---
+import { Image } from 'astro:assets';
+import ProductSprite from './ProductSprite.astro';
+import cifutCap from '../assets/series/cifut/cap.png';
+import cifutHoodie from '../assets/series/cifut/hoodie.png';
+import cifutShirt from '../assets/series/cifut/shirt.png';
+import cifutSocks from '../assets/series/cifut/socks.png';
+import cifutTshirt from '../assets/series/cifut/tshirt.png';
+import { getProduct } from '../data/custom-order';
+import { buildProductsQuery, productCategories, productSeries } from '../data/products';
+import type { Locale } from '../i18n/config';
+import { getCustomDesignPath, getHomePath, getPagePath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].productsPage;
+const productsPath = getPagePath(locale, 'products');
+const categoryLabel = (id: (typeof productCategories)[number]['id']) => ui[locale].nav.categories[id];
+const typeLabel = (id: string) => getProduct(id)?.label[locale] ?? id;
+const cards = productCategories.flatMap((category) =>
+	category.types.map((type) => ({
+		category: category.id,
+		type,
+		categoryLabel: categoryLabel(category.id),
+		typeLabel: typeLabel(type),
+		href: `${getCustomDesignPath(locale)}?product=${type}`,
+	})),
+);
+// Product photos of each series, with the centre of the embroidery (percent of the photo) for the zoomed thumbnail.
+interface SeriesPhoto {
+	photo: ImageMetadata;
+	focus: { x: number; y: number };
+	/** The thumbnail shows the photo at this many times its size. */
+	zoom: number;
+}
+const seriesPhotos: Record<string, Partial<Record<string, SeriesPhoto>>> = {
+	cifut: {
+		tshirt: { photo: cifutTshirt, focus: { x: 67, y: 31 }, zoom: 5 },
+		shirt: { photo: cifutShirt, focus: { x: 67, y: 32 }, zoom: 5 },
+		hoodie: { photo: cifutHoodie, focus: { x: 67, y: 36 }, zoom: 5 },
+		cap: { photo: cifutCap, focus: { x: 50, y: 37 }, zoom: 2.8 },
+		socks: { photo: cifutSocks, focus: { x: 23, y: 31 }, zoom: 5 },
+	},
+};
+const PHOTO_RATIO = 1402 / 1122;
+const zoomStyle = ({ focus, zoom }: SeriesPhoto) =>
+	`width:${zoom * 100}%;left:${(0.5 - (zoom * focus.x) / 100) * 100}%;top:${(0.5 - (zoom * PHOTO_RATIO * focus.y) / 100) * 100}%`;
+const seriesCards = productSeries.flatMap((series) =>
+	series.types.map((type) => ({
+		series: series.id,
+		type,
+		image: seriesPhotos[series.id]?.[type],
+		categoryLabel: series.label[locale],
+		typeLabel: typeLabel(type),
+		href: `${getCustomDesignPath(locale)}?product=${type}`,
+	})),
+);
+---
+
+<section class="section products">
+	<ProductSprite />
+	<div class="container" id="products-root" data-count-template={t.results}>
+		<a class="back" href={getHomePath(locale)}>{t.back}</a>
+		<p class="eyebrow">{t.eyebrow}</p>
+		<h1 class="section-title">{t.title}</h1>
+		<p class="section-lead">{t.lead}</p>
+
+		<div class="filters">
+			<div class="chips" role="group" aria-label={t.categoryFilter}>
+				<a class="chip" data-filter-category="" href={productsPath}>{t.allCategories}</a>
+				{
+					productCategories.map((category) => (
+						<a
+							class="chip"
+							data-filter-category={category.id}
+							href={`${productsPath}${buildProductsQuery({ category: category.id })}`}
+						>
+							{categoryLabel(category.id)}
+						</a>
+					))
+				}
+			</div>
+			{
+				productCategories.map((category) => (
+					<div class="chips chips--types" data-types-for={category.id} role="group" aria-label={t.typeFilter} hidden>
+						<a
+							class="chip"
+							data-filter-category={category.id}
+							data-filter-type=""
+							href={`${productsPath}${buildProductsQuery({ category: category.id })}`}
+						>
+							{t.allTypes}
+						</a>
+						{category.types.map((type) => (
+							<a
+								class="chip"
+								data-filter-category={category.id}
+								data-filter-type={type}
+								href={`${productsPath}${buildProductsQuery({ category: category.id, type })}`}
+							>
+								{typeLabel(type)}
+							</a>
+						))}
+					</div>
+				))
+			}
+			<div class="chips" role="group" aria-label={t.seriesFilter}>
+				{
+					productSeries.map((series) => (
+						<a
+							class="chip"
+							data-filter-category=""
+							data-filter-series={series.id}
+							href={`${productsPath}${buildProductsQuery({ series: series.id })}`}
+						>
+							{series.label[locale]}
+						</a>
+					))
+				}
+			</div>
+		</div>
+
+		<p class="count" data-count aria-live="polite"></p>
+
+		<ul class="grid">
+			{
+				cards.map((card) => (
+					<li class="card" data-product-card data-category={card.category} data-type={card.type}>
+						<div class="picture">
+							<svg viewBox="0 0 200 200" aria-hidden="true">
+								<use href={`#shape-${card.type}`}></use>
+							</svg>
+						</div>
+						<p class="category">{card.categoryLabel}</p>
+						<h2>{card.typeLabel}</h2>
+						<p class="note">{t.note}</p>
+						<a class="button button--ghost" href={card.href}>{t.cta}</a>
+					</li>
+				))
+			}
+			{
+				seriesCards.map((card) => (
+					<li class="card" data-product-card data-series={card.series} data-type={card.type} hidden>
+						<div class="picture picture--photo">
+							{card.image ? (
+								<>
+									<Image
+										class="photo"
+										src={card.image.photo}
+										alt={`${card.categoryLabel} – ${card.typeLabel}`}
+										width={560}
+										height={700}
+									/>
+									<span class="zoom" aria-hidden="true">
+										<Image src={card.image.photo} alt="" width={800} height={1000} style={zoomStyle(card.image)} />
+									</span>
+								</>
+							) : (
+								<svg viewBox="0 0 200 200" aria-hidden="true">
+									<use href={`#shape-${card.type}`} />
+								</svg>
+							)}
+						</div>
+						<p class="category">{card.categoryLabel}</p>
+						<h2>{card.typeLabel}</h2>
+						<p class="note">{t.note}</p>
+						<a class="button button--ghost" href={card.href}>{t.cta}</a>
+					</li>
+				))
+			}
+		</ul>
+		<p class="empty" data-empty hidden>{t.empty}</p>
+	</div>
+</section>
+
+<script>
+	import { initProductsFilter } from '../lib/products-filter';
+
+	const root = document.querySelector<HTMLElement>('#products-root');
+
+	if (root) {
+		initProductsFilter(root);
+	}
+</script>
+
+<style>
+	.back {
+		display: inline-block;
+		margin-bottom: 1.5rem;
+		padding: 0.35rem 1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s;
+	}
+
+	.back:hover {
+		background: var(--color-lilac);
+	}
+
+	.filters {
+		display: grid;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.chips[hidden] {
+		display: none;
+	}
+
+	.chip {
+		padding: 0.45rem 1.1rem;
+		border: 1px solid var(--color-line-strong);
+		border-radius: 999px;
+		background: var(--color-paper);
+		font-weight: 700;
+		text-decoration: none;
+		transition: background 0.15s, border-color 0.15s;
+	}
+
+	.chip:hover {
+		background: var(--color-lilac);
+	}
+
+	.chip[aria-current='true'] {
+		border-color: var(--color-lilac-strong);
+		background: var(--color-lilac-strong);
+	}
+
+	.chips--types .chip {
+		padding: 0.3rem 0.9rem;
+		font-size: 0.9rem;
+	}
+
+	.chips--types .chip[aria-current='true'] {
+		border-color: var(--color-mint-strong);
+		background: var(--color-mint-strong);
+	}
+
+	.count {
+		margin: 1.5rem 0 1rem;
+		color: var(--color-ink-soft);
+		font-weight: 600;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+		gap: 1.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.card {
+		display: grid;
+		gap: 0.3rem;
+		align-content: start;
+		padding: 1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 18px;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+		transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+	}
+
+	.card[hidden] {
+		display: none;
+	}
+
+	.card:hover {
+		transform: translateY(-3px);
+		box-shadow: var(--shadow-lift);
+	}
+
+	.picture {
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1;
+		margin-bottom: 0.6rem;
+		border-radius: 14px;
+		background: var(--color-lilac);
+	}
+
+	.picture--photo {
+		position: relative;
+		aspect-ratio: 4 / 5;
+		overflow: hidden;
+		background: var(--color-paper);
+	}
+
+	.picture--photo :global(.photo) {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* A close-up of the embroidery, cut from the same photo. */
+	.zoom {
+		position: absolute;
+		right: 0.5rem;
+		bottom: 0.5rem;
+		width: 26%;
+		aspect-ratio: 1;
+		overflow: hidden;
+		border: 2px solid var(--color-paper);
+		border-radius: 50%;
+		background: var(--color-paper);
+		box-shadow: var(--shadow);
+	}
+
+	.zoom :global(img) {
+		position: absolute;
+		max-width: none;
+		height: auto;
+	}
+
+	.picture svg {
+		width: 62%;
+		fill: var(--color-paper);
+		stroke: var(--color-ink-soft);
+		stroke-width: 1.5;
+	}
+
+	.category {
+		margin: 0;
+		color: var(--color-thread-dark);
+		font-size: 0.78rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 1.4rem;
+	}
+
+	.note {
+		margin: 0 0 0.6rem;
+		color: var(--color-ink-soft);
+		font-size: 0.9rem;
+	}
+
+	.empty {
+		padding: 2rem;
+		text-align: center;
+		color: var(--color-ink-soft);
+	}
+</style>

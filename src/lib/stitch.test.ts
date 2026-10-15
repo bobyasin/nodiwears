@@ -5,15 +5,22 @@ import { buildStitchPlan, NO_BIN } from './stitch';
 const WIDTH = 40;
 const HEIGHT = 20;
 
-function makeImage(dark: readonly (readonly [number, number])[]): Uint8ClampedArray {
-  const data = new Uint8ClampedArray(WIDTH * HEIGHT * 4).fill(250);
+const NAVY = [20, 30, 60] as const;
+const LILAC = [150, 110, 205] as const;
+
+function makeImage(
+  dark: readonly (readonly [number, number])[],
+  colour: readonly [number, number, number] = NAVY,
+  base?: Uint8ClampedArray,
+): Uint8ClampedArray {
+  const data = base ?? new Uint8ClampedArray(WIDTH * HEIGHT * 4).fill(250);
 
   for (const [x, y] of dark) {
     const offset = (y * WIDTH + x) * 4;
 
-    data[offset] = 20;
-    data[offset + 1] = 30;
-    data[offset + 2] = 60;
+    data[offset] = colour[0];
+    data[offset + 1] = colour[1];
+    data[offset + 2] = colour[2];
   }
 
   return data;
@@ -75,5 +82,39 @@ describe('buildStitchPlan', () => {
     const plan = buildStitchPlan(makeImage([]), WIDTH, HEIGHT);
 
     expect(plan.order).toHaveLength(0);
+  });
+
+  it('should finish the lilac thread before the navy letters that touch it', () => {
+    const thread: [number, number][] = Array.from({ length: 12 }, (_, i): [number, number] => [10, 2 + i]);
+    const letter: [number, number][] = Array.from({ length: 10 }, (_, i): [number, number] => [11 + i, 4]);
+    const lateThread: [number, number][] = Array.from({ length: 6 }, (_, i): [number, number] => [10, 14 + i]);
+    const image = makeImage(letter, NAVY, makeImage([...thread, ...lateThread], LILAC));
+    const plan = buildStitchPlan(image, WIDTH, HEIGHT, { minStroke: 1 });
+
+    expect(plan.bin[at(10, 2)]).toBe(0);
+    expect(plan.bin[at(11, 4)]).toBeGreaterThan(plan.bin[at(10, 13)]);
+    expect(plan.bin[at(11, 4)]).toBeLessThan(plan.bin[at(20, 4)]);
+  });
+
+  it('should drop faint specks that belong to no stroke', () => {
+    const image = makeImage(stroke);
+    const speck = at(30, 3) * 4;
+
+    image[speck] = image[speck + 1] = image[speck + 2] = 215;
+
+    const plan = buildStitchPlan(image, WIDTH, HEIGHT);
+
+    expect(plan.alpha[at(30, 3)]).toBe(0);
+    expect(plan.bin[at(30, 3)]).toBe(NO_BIN);
+  });
+
+  it('should fold a tiny fringe fragment into the stroke it touches', () => {
+    const thread: [number, number][] = Array.from({ length: 12 }, (_, i): [number, number] => [10, 2 + i]);
+    const fringe: [number, number][] = [[11, 8], [12, 8]];
+    const image = makeImage(fringe, NAVY, makeImage(thread, LILAC));
+    const plan = buildStitchPlan(image, WIDTH, HEIGHT);
+
+    expect(plan.bin[at(11, 8)]).toBeLessThan(plan.bin[at(10, 13)] + 40);
+    expect(plan.bin[at(12, 8)]).not.toBe(NO_BIN);
   });
 });

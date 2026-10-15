@@ -23,6 +23,10 @@ export const MAX_NAME_LENGTH = 100;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LINE_BREAKS = /[\r\n]+/g;
 
+export function isValidEmail(value: string): boolean {
+  return EMAIL_PATTERN.test(value.trim());
+}
+
 export function validateContact(input: ContactInput): ContactError[] {
   const errors: ContactError[] = [];
   const name = input.name.trim();
@@ -34,7 +38,7 @@ export function validateContact(input: ContactInput): ContactError[] {
     errors.push('name-too-long');
   }
 
-  if (!EMAIL_PATTERN.test(input.email.trim())) {
+  if (!isValidEmail(input.email)) {
     errors.push('email-invalid');
   }
 

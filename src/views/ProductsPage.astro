@@ -1,0 +1,31 @@
+---
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import ProductList from '../components/ProductList.astro';
+import { siteConfig } from '../data/site';
+import { getOtherLocale, type Locale } from '../i18n/config';
+import { getPagePath } from '../i18n/paths';
+import { ui } from '../i18n/ui';
+import Layout from '../layouts/Layout.astro';
+
+interface Props {
+	locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale].productsPage;
+const alternatePath = getPagePath(getOtherLocale(locale), 'products');
+---
+
+<Layout
+	locale={locale}
+	title={`${t.seoTitle} | ${siteConfig.name}`}
+	description={t.description}
+	alternatePath={alternatePath}
+>
+	<Header locale={locale} alternatePath={alternatePath} />
+	<main id="main">
+		<ProductList locale={locale} />
+	</main>
+	<Footer locale={locale} />
+</Layout>

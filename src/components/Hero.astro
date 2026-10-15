@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import heroLogo from '../assets/nodiwears.jpeg';
 import type { Locale } from '../i18n/config';
-import { getSectionPath } from '../i18n/paths';
+import { getCustomDesignPath, getSectionPath } from '../i18n/paths';
 import { ui } from '../i18n/ui';
 
 interface Props {
@@ -24,7 +24,7 @@ const t = ui[locale].hero;
 			<p class="section-lead">{t.lead}</p>
 			<div class="actions">
 				<a class="button" href={getSectionPath(locale, 'katalog')}>{t.ctaCatalog}</a>
-				<a class="button button--ghost" href={getSectionPath(locale, 'iletisim')}>{t.ctaCustom}</a>
+				<a class="button button--ghost" href={getCustomDesignPath(locale)}>{t.ctaCustom}</a>
 			</div>
 			<ul class="trust" aria-label={t.trustLabel}>
 				{[t.trust1, t.trust2, t.trust3].map((item) => <li>{item}</li>)}
@@ -62,9 +62,12 @@ const t = ui[locale].hero;
 	}
 
 
-	const STITCH_MS = 7000;
+	const STITCH_MS = 9000;
 	const HOLD_MS = 3500;
 	const FADE_MS = 700;
+	const STITCH_BINS = 8;
+	/** Point in a stitch, 0 to 1, where the needle has gone through the fabric. */
+	const PIERCE_AT = 0.7;
 
 	async function playStitching(wrap: HTMLElement, image: HTMLImageElement, canvas: HTMLCanvasElement) {
 		await image.decode();
@@ -119,9 +122,49 @@ const t = ui[locale].hero;
 		canvas.height = side;
 		wrap.style.backgroundColor = fabric;
 
+		// The needle works in stitches: it hovers over the next spot, dips through the fabric,
+		// and the thread appears where it went in.
+		const stitches = Math.ceil(plan.bins / STITCH_BINS);
+		const spotX = new Float32Array(stitches + 1).fill(side / 2);
+		const spotY = new Float32Array(stitches + 1).fill(side / 2);
+		const spotColour: string[] = new Array(stitches + 1).fill('#c9391b');
+		const smooth = (from: number, to: number, value: number) => {
+			const t = Math.min(1, Math.max(0, (value - from) / (to - from)));
+
+			return t * t * (3 - 2 * t);
+		};
+
+		for (let n = 0; n < stitches; n++) {
+			let sumX = 0;
+			let sumY = 0;
+			let added = 0;
+			let pick = -1;
+
+			for (let k = plan.binStart[n * STITCH_BINS]; k < plan.binStart[Math.min(plan.bins, (n + 1) * STITCH_BINS)]; k++) {
+				const pixel = plan.order[k];
+
+				sumX += pixel % side;
+				sumY += Math.floor(pixel / side);
+				added++;
+
+				if (plan.alpha[pixel] === 255) {
+					pick = pixel;
+				}
+			}
+
+			// Stitch n lands at the middle of what it reveals; spot 0 is where the needle starts.
+			spotX[n + 1] = added ? sumX / added : spotX[n];
+			spotY[n + 1] = added ? sumY / added : spotY[n];
+			spotColour[n + 1] =
+				pick < 0
+					? spotColour[n]
+					: `rgb(${source.data[pick * 4]} ${source.data[pick * 4 + 1]} ${source.data[pick * 4 + 2]})`;
+		}
+
+		spotX[0] = spotX[1];
+		spotY[0] = spotY[1];
+
 		let revealed = 0;
-		let tipX = side / 2;
-		let tipY = side / 2;
 
 		function reset() {
 			for (let i = 3; i < layer.data.length; i += 4) {
@@ -130,7 +173,52 @@ const t = ui[locale].hero;
 			revealed = 0;
 		}
 
-		function draw(showTip: boolean) {
+		function drawNeedle(stitch: number, phase: number) {
+			if (!context) {
+				return;
+			}
+
+			const travel = smooth(0, PIERCE_AT, phase);
+			const lift = side * 0.06 * smooth(0, 0.2, phase) * (1 - smooth(0.5, PIERCE_AT, phase));
+			const x = spotX[stitch] + (spotX[stitch + 1] - spotX[stitch]) * travel;
+			const y = spotY[stitch] + (spotY[stitch + 1] - spotY[stitch]) * travel - lift;
+			const length = side * 0.13;
+			const eyeX = x + length * 0.42;
+			const eyeY = y - length * 0.91;
+
+			// Thread runs from the eye back to the last stitch, so each stitch is pulled tight.
+			context.lineCap = 'round';
+			context.strokeStyle = spotColour[stitch + 1];
+			context.lineWidth = side * 0.006;
+			context.beginPath();
+			context.moveTo(eyeX, eyeY);
+			context.quadraticCurveTo(
+				(eyeX + spotX[stitch]) / 2 + length * 0.25,
+				(eyeY + spotY[stitch]) / 2 - length * 0.1,
+				spotX[stitch],
+				spotY[stitch],
+			);
+			context.stroke();
+
+			context.shadowColor = 'rgb(33 26 56 / 0.35)';
+			context.shadowBlur = side * 0.012;
+			context.shadowOffsetY = side * 0.008 * (lift / (side * 0.06) + 0.3);
+			context.strokeStyle = '#8c939c';
+			context.lineWidth = side * 0.011;
+			context.beginPath();
+			context.moveTo(x, y);
+			context.lineTo(eyeX, eyeY);
+			context.stroke();
+			context.shadowColor = 'transparent';
+			context.strokeStyle = '#d6dbe0';
+			context.lineWidth = side * 0.004;
+			context.beginPath();
+			context.moveTo(x + length * 0.03, y - length * 0.07);
+			context.lineTo(eyeX - length * 0.02, eyeY + length * 0.12);
+			context.stroke();
+		}
+
+		function draw(needle?: { stitch: number; phase: number }) {
 			if (!context || !layerContext) {
 				return;
 			}
@@ -140,40 +228,19 @@ const t = ui[locale].hero;
 			context.fillRect(0, 0, side, side);
 			context.drawImage(layerCanvas, 0, 0);
 
-			if (showTip) {
-				context.beginPath();
-				context.arc(tipX, tipY, side * 0.016, 0, Math.PI * 2);
-				context.fillStyle = '#c9391b';
-				context.strokeStyle = '#ffffff';
-				context.lineWidth = side * 0.006;
-				context.shadowColor = 'rgb(201 57 27 / 0.55)';
-				context.shadowBlur = side * 0.03;
-				context.fill();
-				context.stroke();
-				context.shadowBlur = 0;
+			if (needle) {
+				drawNeedle(needle.stitch, needle.phase);
 			}
 		}
 
 		function advance(untilBin: number) {
-			let sumX = 0;
-			let sumY = 0;
-			let added = 0;
-
-			while (revealed < plan.bins && revealed <= untilBin) {
+			while (revealed < plan.bins && revealed < untilBin) {
 				for (let k = plan.binStart[revealed]; k < plan.binStart[revealed + 1]; k++) {
 					const pixel = plan.order[k];
 
 					layer.data[pixel * 4 + 3] = plan.alpha[pixel];
-					sumX += pixel % side;
-					sumY += Math.floor(pixel / side);
-					added++;
 				}
 				revealed++;
-			}
-
-			if (added > 0) {
-				tipX = sumX / added;
-				tipY = sumY / added;
 			}
 		}
 
@@ -187,14 +254,19 @@ const t = ui[locale].hero;
 				const elapsed = now - started;
 
 				if (elapsed < STITCH_MS) {
-					advance(Math.floor((elapsed / STITCH_MS) * plan.bins));
-					draw(true);
+					const position = (elapsed / STITCH_MS) * stitches;
+					const stitch = Math.floor(position);
+					const phase = position - stitch;
+
+					// The thread shows up once the needle has gone through.
+					advance((stitch + (phase >= PIERCE_AT ? 1 : 0)) * STITCH_BINS);
+					draw({ stitch, phase });
 					requestAnimationFrame(frame);
 					return;
 				}
 
 				advance(plan.bins);
-				draw(false);
+				draw();
 				setTimeout(() => {
 					canvas.style.opacity = '0';
 					setTimeout(cycle, FADE_MS);
@@ -204,7 +276,7 @@ const t = ui[locale].hero;
 			requestAnimationFrame(frame);
 		}
 
-		draw(false);
+		draw();
 		canvas.hidden = false;
 		wrap.classList.add('is-live');
 		cycle();
@@ -250,7 +322,7 @@ const t = ui[locale].hero;
 	}
 
 	mark {
-		background: linear-gradient(transparent 62%, color-mix(in srgb, var(--color-sun) 80%, transparent) 62%);
+		background: linear-gradient(transparent 62%, var(--color-sun-soft) 62%);
 		color: var(--color-thread-dark);
 		font-style: italic;
 	}
