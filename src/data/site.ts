@@ -21,6 +21,8 @@ export const siteConfig = {
   url: 'https://www.nodiwears.com',
   contactEmail: 'merhaba@nodiwears.com',
   contactPhone: '+90 000 000 00 00',
+  // WhatsApp number, e.g. '+90 532 123 45 67'. While empty (or a placeholder) the WhatsApp buttons show as "coming soon" and do not open anything.
+  whatsappNumber: '',
   address: { tr: 'Adres bilgisi yakında', en: 'Address coming soon' } satisfies Localized<string>,
 } as const;
 

@@ -76,6 +76,7 @@ Yok: projede tarayıcı test altyapısı bulunmuyor. Eklenirse: katalog menüsü
 Statik `dist/` herhangi bir statik barındırmaya yüklenebilir. Yayın öncesi `site.ts` içindeki e-posta/telefon gerçek değerlerle değiştirilmeli.
 
 ## Known Limitations
+- WhatsApp: `siteConfig.whatsappNumber` (`src/data/site.ts`) boş olduğu sürece her sayfada sağ altta pasif "WhatsApp · Yakında" düğmesi (telefonda yalnızca simge) ve iletişim bölümünde "Yakında" kartı görünür; hiçbir yere yönlendirmez. Numara girilince (`+90 532 123 45 67` gibi) aynı yerler gerçek bağlantıya dönüşür ve `wa.me` ile sohbeti açar. Desen sayfasında mesaj o desenle önceden doldurulur, diğer sayfalarda genel bir selamlama gelir. Numara geçersizse (boş, yer tutucu, çok kısa) düğme pasif kalır. WhatsApp kullanımı kişisel veriyi Meta'ya aktarır; yayına almadan önce gizlilik/KVKK metnine bir cümle eklenmesi önerilir.
 - Desen görselleri şimdilik **örnek (dummy)** görsellerdir: her desen için `src/lib/dummy-image.ts` desen kimliğinden tohumlanan 3 çapraz dikiş SVG'si üretir (desen, yakın plan, tişört üzerinde) ve derleme sırasında `/dummy/<desen>/<1-3>.svg` adreslerine yazılır. Gerçek fotoğraflar `site.ts` içinde ilgili düğümün `images` listesine eklenince (`getDesignImages`) o desen için örnekler kullanılmaz; tüm desenlere gerçek görsel girince `src/pages/dummy/` ve `dummy-image.ts` silinebilir.
 - İletişim bilgileri ve desen adları yer tutucudur.
 - Desen sayfasında görsel yok ("Görsel yakında"); form `mailto` kullandığı için e-posta uygulaması gerekir.
@@ -94,3 +95,4 @@ Statik `dist/` herhangi bir statik barındırmaya yüklenebilir. Yayın öncesi 
 | 2026-10-13 | Her desen kendi sayfasını açar (`/katalog/<id>/`); form o desenle önceden dolu gelir; menü bağlantıları `/#...` oldu. |
 | 2026-10-15 | Katalog solda açılır koleksiyon menüsüne ve sağda önizleme paneline dönüştü; renkli kart ızgarası ve filtre butonları (`catalog-filter`) kaldırıldı. |
 | 2026-10-15 | Katalog önizleme paneli desen görsellerini sırayla gösteren slayt gösterisine dönüştü; örnek (dummy) görseller eklendi. |
+| 2026-10-15 | WhatsApp desteği: yüzen düğme, iletişim bağlantısı ve desen sayfasında önceden doldurulmuş mesaj; numara girilene kadar pasif "Yakında" durumu. |

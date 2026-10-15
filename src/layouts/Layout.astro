@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import CookieBanner from '../components/CookieBanner.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
 import ogImage from '../assets/nodiwears.jpeg';
 import { siteConfig } from '../data/site';
 import { getOtherLocale, type Locale } from '../i18n/config';
@@ -14,9 +15,11 @@ interface Props {
 	alternatePath?: string;
 	noindex?: boolean;
 	structuredData?: readonly object[];
+	/** Text pre-filled in the WhatsApp chat, e.g. the design a visitor is looking at. */
+	whatsappMessage?: string;
 }
 
-const { locale, title, description, alternatePath, noindex = false, structuredData = [] } = Astro.props;
+const { locale, title, description, alternatePath, noindex = false, structuredData = [], whatsappMessage } = Astro.props;
 const t = ui[locale];
 const pageTitle = title ?? `${siteConfig.name} | ${t.meta.tagline}`;
 const pageDescription = description ?? t.meta.description;
@@ -64,6 +67,7 @@ const defaultAlternate = alternates.find((alternate) => alternate.hreflang === '
 	<body>
 		<a class="skip-link" href="#main">{t.nav.skipToContent}</a>
 		<slot />
+		<WhatsAppButton locale={locale} message={whatsappMessage} />
 		<CookieBanner locale={locale} />
 		<script>
 			const observer = new IntersectionObserver(
