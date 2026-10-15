@@ -114,15 +114,24 @@ describe('production domain', () => {
 
 describe('deploy workflow', () => {
   const workflow = read('.github/workflows/deploy.yml');
+  const step = (name: string) => workflow.indexOf(`- name: ${name}`);
 
-  it('should deploy only when main is pushed, or when started by hand', () => {
+  it('should deploy only from main, and let pull requests and manual runs try the pipeline', () => {
     expect(workflow).toMatch(/push:\n\s+branches: \[main\]/);
+    expect(workflow).toMatch(/pull_request:\n\s+branches: \[main\]/);
     expect(workflow).toContain('workflow_dispatch:');
+    expect(workflow).toMatch(/- name: Deploy\n\s+if: github\.ref == 'refs\/heads\/main'/);
   });
 
-  it('should run the tests before it deploys', () => {
-    expect(workflow.indexOf('npm test')).toBeGreaterThan(-1);
-    expect(workflow.indexOf('npm test')).toBeLessThan(workflow.indexOf('npm run deploy'));
+  it('should run the tests and the build before it checks credentials and deploys', () => {
+    expect(step('Test')).toBeGreaterThan(-1);
+    expect(step('Test')).toBeLessThan(step('Build'));
+    expect(step('Build')).toBeLessThan(step('Check Cloudflare credentials'));
+    expect(step('Check Cloudflare credentials')).toBeLessThan(step('Deploy'));
+  });
+
+  it('should verify the Cloudflare credentials without deploying', () => {
+    expect(workflow).toContain('run: npx wrangler whoami');
   });
 
   it('should read the Cloudflare credentials from repository secrets', () => {
@@ -135,7 +144,7 @@ describe('deploy workflow', () => {
     expect(workflow).toMatch(/permissions:\n\s+contents: read/);
   });
 
-  it('should not run two production deploys at the same time', () => {
-    expect(workflow).toContain('group: deploy-production');
+  it('should never run two deploys of the same branch at the same time', () => {
+    expect(workflow).toContain('group: deploy-${{ github.ref }}');
   });
 });

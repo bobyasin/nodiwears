@@ -3,12 +3,16 @@ name: Deploy to Cloudflare
 on:
   push:
     branches: [main]
+  # Pull requests run every check except the deploy, so the pipeline and the
+  # Cloudflare secrets can be tried before merging.
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 # Never run two production deploys at once; a newer push replaces a queued one.
 concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -30,8 +34,18 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Build and deploy
-        run: npm run deploy
+      - name: Build
+        run: npm run build
+
+      - name: Check Cloudflare credentials
+        run: npx wrangler whoami
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

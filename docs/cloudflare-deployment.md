@@ -29,7 +29,7 @@ Proje yalnızca yerelde çalışıyordu; yayın için yapılandırma, güvenlik 
 - `wrangler.jsonc`: ad `nodiwears`, `routes` ile `www.nodiwears.com` (ana adres) ve `nodiwears.com` (yönlendirme için) özel alan adları, `assets.directory: ./dist`, `not_found_handling: 404-page`, `html_handling: auto-trailing-slash`, `compatibility_date`.
 - `public/_headers`: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `Strict-Transport-Security` (6 ay, preload yok), CSP; `/_astro/*` için `Cache-Control`.
 - CSP: `default-src 'self'`, `script-src 'self' 'unsafe-inline'` (Astro küçük modül script'lerini sayfaya gömer), `style-src 'self' 'unsafe-inline'`, `img-src 'self' data:`, `frame-ancestors 'none'`, `object-src 'none'`, `form-action 'self'`. Üçüncü taraf kaynak yok.
-- `.github/workflows/deploy.yml`: `main`'e push ve elle başlatma (`workflow_dispatch`) ile çalışır; sırasıyla `npm ci`, `npm test`, `npm run deploy`. Aynı anda tek yayın (`concurrency`), `contents: read` izni, Node sürümü `.node-version`'dan. Cloudflare bilgileri repo secret'larından okunur (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
+- `.github/workflows/deploy.yml`: `main`'e push, `main`'e açılan pull request ve elle başlatma (`workflow_dispatch`) ile çalışır. Sırasıyla `npm ci`, `npm test`, `npm run build`, `wrangler whoami` (Cloudflare bilgilerini yayın yapmadan doğrular) ve **yalnızca `main` dalında** `wrangler deploy`. Pull request'lerde deploy adımı atlanır, böylece hat ve secret'lar canlıya dokunmadan denenir. Aynı dal için tek çalışma (`concurrency`), `contents: read` izni, Node sürümü `.node-version`'dan. Cloudflare bilgileri repo secret'larından okunur (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`).
 - `src/pages/404.astro`, `.node-version` (22), `package.json` komutları: `deploy` (`astro build && wrangler deploy`), `cf:dev` (yerelde Cloudflare çalışma zamanı), `wrangler` (devDependency).
 
 ## Architecture / Flow
@@ -87,8 +87,8 @@ Yayın yolu: **GitHub Actions** (`main`'e push). Aşağıdaki adımlar bir kez y
 
 ### Günlük akış
 1. Değişiklik bir dalda (örn. `feat/...`) yapılır, `npm test` ve `npm run build` yerelde geçer.
-2. Dal `main`'e merge edilir (PR veya doğrudan).
-3. `main`'e push gelince workflow çalışır: test → build → deploy. Sonuç GitHub'da Actions sekmesinde izlenir.
+2. Dal GitHub'a push edilip `main`'e pull request açılır. Workflow PR'de test, build ve Cloudflare kimlik kontrolünü çalıştırır; **deploy etmez**. Yeşil değilse merge edilmez.
+3. PR `main`'e merge edilince workflow aynı adımları çalıştırır ve ardından deploy eder. Sonuç GitHub'da Actions sekmesinde izlenir.
 4. Yayın sonrası QA senaryoları canlı adreste kontrol edilir.
 
 ### Elle yayın ve geri alma
