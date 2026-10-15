@@ -35,8 +35,10 @@ const tr = {
   },
   catalog: {
     title: 'Katalog',
-    all: 'Tümü',
-    filterLabel: 'Koleksiyona göre filtrele',
+    menuLabel: 'Koleksiyonlar',
+    view: 'İncele',
+    previewLabel: 'Seçili desen görselleri',
+    slide: 'Görsel {n}',
   },
   contact: {
     title: 'Bize yazın',
@@ -135,8 +137,10 @@ const en: typeof tr = {
   },
   catalog: {
     title: 'Catalog',
-    all: 'All',
-    filterLabel: 'Filter by collection',
+    menuLabel: 'Collections',
+    view: 'View',
+    previewLabel: 'Selected design images',
+    slide: 'Image {n}',
   },
   contact: {
     title: 'Write to us',

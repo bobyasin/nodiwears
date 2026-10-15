@@ -111,3 +111,31 @@ describe('production domain', () => {
     expect(robots).not.toMatch(/^Disallow:\s*\/\s*$/m);
   });
 });
+
+describe('deploy workflow', () => {
+  const workflow = read('.github/workflows/deploy.yml');
+
+  it('should deploy only when main is pushed, or when started by hand', () => {
+    expect(workflow).toMatch(/push:\n\s+branches: \[main\]/);
+    expect(workflow).toContain('workflow_dispatch:');
+  });
+
+  it('should run the tests before it deploys', () => {
+    expect(workflow.indexOf('npm test')).toBeGreaterThan(-1);
+    expect(workflow.indexOf('npm test')).toBeLessThan(workflow.indexOf('npm run deploy'));
+  });
+
+  it('should read the Cloudflare credentials from repository secrets', () => {
+    expect(workflow).toContain('${{ secrets.CLOUDFLARE_API_TOKEN }}');
+    expect(workflow).toContain('${{ secrets.CLOUDFLARE_ACCOUNT_ID }}');
+  });
+
+  it('should use the Node version pinned for the project and a read-only token', () => {
+    expect(workflow).toContain('node-version-file: .node-version');
+    expect(workflow).toMatch(/permissions:\n\s+contents: read/);
+  });
+
+  it('should not run two production deploys at the same time', () => {
+    expect(workflow).toContain('group: deploy-production');
+  });
+});
