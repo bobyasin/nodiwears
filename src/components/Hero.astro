@@ -16,6 +16,7 @@ const t = ui[locale].hero;
 <section class="hero" id="top">
 	<div class="container grid">
 		<div class="copy">
+			<p class="eyebrow">{t.eyebrow}</p>
 			<h1>
 				{t.titleLine}<br />
 				<mark>{t.titleMark}</mark>
@@ -25,28 +26,28 @@ const t = ui[locale].hero;
 				<a class="button" href={getSectionPath(locale, 'katalog')}>{t.ctaCatalog}</a>
 				<a class="button button--ghost" href={getSectionPath(locale, 'iletisim')}>{t.ctaCustom}</a>
 			</div>
+			<ul class="trust" aria-label={t.trustLabel}>
+				{[t.trust1, t.trust2, t.trust3].map((item) => <li>{item}</li>)}
+			</ul>
 		</div>
 
 		<div class="stage">
 			<span class="blob blob--lilac" data-depth="-14" aria-hidden="true"></span>
 			<span class="blob blob--mint" data-depth="18" aria-hidden="true"></span>
-			<svg class="squiggle" data-depth="26" viewBox="0 0 120 40" aria-hidden="true">
-				<path d="M4 20c10-18 20-18 30 0s20 18 30 0 20-18 30 0 10 10 22 0" fill="none" stroke="#e5401c" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 10"></path>
+			<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+				<circle cx="50" cy="50" r="48.5" fill="none" stroke="#c9391b" stroke-width="0.7" stroke-linecap="round" stroke-dasharray="2.2 3.6"></circle>
 			</svg>
-			<Image
-				class="sticker"
-				data-depth="8"
-				src={heroLogo}
-				alt={t.logoAlt}
-				width={520}
-				loading="eager"
-				fetchpriority="high"
-			/>
+			<div class="sticker" data-depth="8">
+				<Image id="stitch-img" src={heroLogo} alt={t.logoAlt} width={1024} loading="eager" fetchpriority="high" />
+				<canvas id="stitch-canvas" role="img" aria-label={t.logoAlt} hidden></canvas>
+			</div>
 		</div>
 	</div>
 </section>
 
 <script>
+	import { buildStitchPlan } from '../lib/stitch';
+
 	const hero = document.querySelector<HTMLElement>('#top');
 	const layers = Array.from(document.querySelectorAll<HTMLElement>('#top [data-depth]'));
 	const canMove = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -58,6 +59,165 @@ const t = ui[locale].hero;
 			layer.style.setProperty('--tx', `${(x * depth).toFixed(1)}px`);
 			layer.style.setProperty('--ty', `${(y * depth).toFixed(1)}px`);
 		}
+	}
+
+
+	const STITCH_MS = 7000;
+	const HOLD_MS = 3500;
+	const FADE_MS = 700;
+
+	async function playStitching(wrap: HTMLElement, image: HTMLImageElement, canvas: HTMLCanvasElement) {
+		await image.decode();
+
+		const side = image.naturalHeight;
+		const crop = document.createElement('canvas');
+
+		crop.width = side;
+		crop.height = side;
+
+		const cropContext = crop.getContext('2d', { willReadFrequently: true });
+		const context = canvas.getContext('2d');
+
+		if (!cropContext || !context) {
+			throw new Error('canvas unavailable');
+		}
+
+		// Same square crop the circular frame shows (object-fit: cover, centred).
+		cropContext.drawImage(image, (image.naturalWidth - side) / 2, 0, side, side, 0, 0, side, side);
+
+		const source = cropContext.getImageData(0, 0, side, side);
+		const plan = buildStitchPlan(source.data, side, side);
+		const layer = new ImageData(new Uint8ClampedArray(source.data), side, side);
+		const layerCanvas = document.createElement('canvas');
+
+		layerCanvas.width = side;
+		layerCanvas.height = side;
+
+		const layerContext = layerCanvas.getContext('2d');
+
+		if (!layerContext) {
+			throw new Error('canvas unavailable');
+		}
+
+		let red = 0;
+		let green = 0;
+		let blue = 0;
+		let count = 0;
+
+		for (let i = 0; i < plan.alpha.length; i++) {
+			if (plan.alpha[i] === 0) {
+				red += source.data[i * 4];
+				green += source.data[i * 4 + 1];
+				blue += source.data[i * 4 + 2];
+				count++;
+			}
+		}
+
+		const fabric = `rgb(${Math.round(red / count)} ${Math.round(green / count)} ${Math.round(blue / count)})`;
+
+		canvas.width = side;
+		canvas.height = side;
+		wrap.style.backgroundColor = fabric;
+
+		let revealed = 0;
+		let tipX = side / 2;
+		let tipY = side / 2;
+
+		function reset() {
+			for (let i = 3; i < layer.data.length; i += 4) {
+				layer.data[i] = 0;
+			}
+			revealed = 0;
+		}
+
+		function draw(showTip: boolean) {
+			if (!context || !layerContext) {
+				return;
+			}
+
+			layerContext.putImageData(layer, 0, 0);
+			context.fillStyle = fabric;
+			context.fillRect(0, 0, side, side);
+			context.drawImage(layerCanvas, 0, 0);
+
+			if (showTip) {
+				context.beginPath();
+				context.arc(tipX, tipY, side * 0.016, 0, Math.PI * 2);
+				context.fillStyle = '#c9391b';
+				context.strokeStyle = '#ffffff';
+				context.lineWidth = side * 0.006;
+				context.shadowColor = 'rgb(201 57 27 / 0.55)';
+				context.shadowBlur = side * 0.03;
+				context.fill();
+				context.stroke();
+				context.shadowBlur = 0;
+			}
+		}
+
+		function advance(untilBin: number) {
+			let sumX = 0;
+			let sumY = 0;
+			let added = 0;
+
+			while (revealed < plan.bins && revealed <= untilBin) {
+				for (let k = plan.binStart[revealed]; k < plan.binStart[revealed + 1]; k++) {
+					const pixel = plan.order[k];
+
+					layer.data[pixel * 4 + 3] = plan.alpha[pixel];
+					sumX += pixel % side;
+					sumY += Math.floor(pixel / side);
+					added++;
+				}
+				revealed++;
+			}
+
+			if (added > 0) {
+				tipX = sumX / added;
+				tipY = sumY / added;
+			}
+		}
+
+		function cycle() {
+			reset();
+			canvas.style.opacity = '1';
+
+			const started = performance.now();
+
+			function frame(now: number) {
+				const elapsed = now - started;
+
+				if (elapsed < STITCH_MS) {
+					advance(Math.floor((elapsed / STITCH_MS) * plan.bins));
+					draw(true);
+					requestAnimationFrame(frame);
+					return;
+				}
+
+				advance(plan.bins);
+				draw(false);
+				setTimeout(() => {
+					canvas.style.opacity = '0';
+					setTimeout(cycle, FADE_MS);
+				}, HOLD_MS);
+			}
+
+			requestAnimationFrame(frame);
+		}
+
+		draw(false);
+		canvas.hidden = false;
+		wrap.classList.add('is-live');
+		cycle();
+	}
+
+	const stitchWrap = document.querySelector<HTMLElement>('#top .sticker');
+	const stitchImage = document.querySelector<HTMLImageElement>('#stitch-img');
+	const stitchCanvas = document.querySelector<HTMLCanvasElement>('#stitch-canvas');
+
+	if (canMove && stitchWrap && stitchImage && stitchCanvas) {
+		playStitching(stitchWrap, stitchImage, stitchCanvas).catch(() => stitchWrap.classList.add('is-static'));
+	} else {
+		stitchWrap?.classList.add('is-static');
 	}
 
 	if (canMove) {
@@ -80,28 +240,46 @@ const t = ui[locale].hero;
 	.grid {
 		display: grid;
 		grid-template-columns: 1.1fr 0.9fr;
-		gap: 2rem;
+		gap: 3rem;
 		align-items: center;
 	}
 
 	h1 {
-		font-size: clamp(3.4rem, 11vw, 7.5rem);
+		font-size: clamp(3rem, 9vw, 6.25rem);
+		line-height: 1;
 	}
 
 	mark {
-		display: inline-block;
-		padding: 0 0.2em;
-		border: 3px solid var(--color-ink);
-		border-radius: 0.3em;
-		background: var(--color-pink);
-		box-shadow: var(--shadow);
-		color: var(--color-ink);
-		transform: rotate(-2deg);
-		transition: transform 0.2s;
+		background: linear-gradient(transparent 62%, color-mix(in srgb, var(--color-sun) 80%, transparent) 62%);
+		color: var(--color-thread-dark);
+		font-style: italic;
 	}
 
-	mark:hover {
-		transform: rotate(2deg) scale(1.04);
+	.copy > * {
+		animation: rise 0.7s var(--ease) both;
+	}
+
+	.copy > :nth-child(2) {
+		animation-delay: 0.08s;
+	}
+
+	.copy > :nth-child(3) {
+		animation-delay: 0.16s;
+	}
+
+	.copy > :nth-child(4) {
+		animation-delay: 0.24s;
+	}
+
+	.copy > :nth-child(5) {
+		animation-delay: 0.32s;
+	}
+
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(22px);
+		}
 	}
 
 	.actions {
@@ -109,6 +287,39 @@ const t = ui[locale].hero;
 		flex-wrap: wrap;
 		gap: 0.9rem;
 		margin-top: 1.75rem;
+	}
+
+	.trust {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.6rem 1.75rem;
+		margin: 2.25rem 0 0;
+		padding: 1.25rem 0 0;
+		border-top: 1px solid var(--color-line);
+		color: var(--color-ink-soft);
+		font-size: 0.92rem;
+		font-weight: 600;
+		list-style: none;
+	}
+
+	.trust li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.trust li::before {
+		display: grid;
+		flex: none;
+		place-items: center;
+		width: 1.15rem;
+		height: 1.15rem;
+		border-radius: 50%;
+		background: var(--color-thread);
+		color: var(--color-paper);
+		font-size: 0.7rem;
+		line-height: 1;
+		content: '✓';
 	}
 
 	.stage {
@@ -121,16 +332,13 @@ const t = ui[locale].hero;
 		margin-inline: auto;
 	}
 
-	.blob,
-	.squiggle,
-	.stage :global(.sticker) {
+	.blob {
 		translate: var(--tx, 0) var(--ty, 0);
 		transition: translate 0.25s ease-out;
 	}
 
 	.blob {
 		position: absolute;
-		border: 3px solid var(--color-ink);
 		border-radius: 50%;
 	}
 
@@ -144,34 +352,56 @@ const t = ui[locale].hero;
 		background: var(--color-mint);
 	}
 
-	.squiggle {
+	.ring {
 		position: absolute;
-		right: -2%;
-		bottom: 4%;
-		width: 42%;
+		inset: 4%;
+		width: 92%;
+		height: 92%;
+		animation: spin 60s linear infinite;
+		pointer-events: none;
 	}
 
-	.stage :global(.sticker) {
+	@keyframes spin {
+		to {
+			rotate: 360deg;
+		}
+	}
+
+	.sticker {
 		position: relative;
-		width: 68%;
-		height: auto;
+		width: 66%;
 		aspect-ratio: 1;
-		object-fit: cover;
-		border: 4px solid var(--color-ink);
+		overflow: hidden;
+		border: 6px solid var(--color-paper);
 		border-radius: 50%;
 		background: var(--color-cream);
-		box-shadow: 6px 6px 0 var(--color-ink);
-		rotate: -6deg;
-		transition: translate 0.25s ease-out, rotate 0.3s;
+		box-shadow: var(--shadow-lift);
+		translate: var(--tx, 0) var(--ty, 0);
+		transition: translate 0.25s ease-out;
 	}
 
-	.stage :global(.sticker):hover {
-		rotate: 6deg;
+	.sticker :global(img),
+	.sticker canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
 	}
 
+	.sticker canvas {
+		position: absolute;
+		inset: 0;
+		transition: opacity 0.7s ease;
+	}
+
+	/* While the stitching animation owns the frame, hide the finished logo until it is ready. */
+	:global(.js) .sticker:not(.is-static) :global(img) {
+		opacity: 0;
+	}
 	@media (max-width: 820px) {
 		.grid {
 			grid-template-columns: 1fr;
+			gap: 2rem;
 		}
 
 		.stage {

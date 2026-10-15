@@ -1,20 +1,23 @@
 :root {
-  --color-cream: #fff8ee;
+  --color-cream: #faf6ef;
   --color-paper: #ffffff;
-  --color-ink: #2d1f4d;
-  --color-ink-soft: #5b4d7a;
-  --color-thread: #e5401c;
-  --color-thread-dark: #c2330f;
-  --color-sun: #ffd84d;
-  --color-lilac: #cdb8ff;
-  --color-mint: #b9f0d4;
-  --color-pink: #ffb3d1;
-  --color-line: #eadcc6;
-  --font-display: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --color-ink: #211a38;
+  --color-ink-soft: #5a5470;
+  --color-thread: #c9391b;
+  --color-thread-dark: #a82d14;
+  --color-sun: #f0c24b;
+  --color-lilac: #ece7f6;
+  --color-mint: #e3f0e8;
+  --color-pink: #f6e6ea;
+  --color-line: #e6dece;
+  --color-line-strong: #cfc4ae;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
   --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --radius: 20px;
+  --radius: 16px;
   --container: 1120px;
-  --shadow: 4px 4px 0 var(--color-ink);
+  --shadow: 0 1px 2px rgb(33 26 56 / 0.06), 0 6px 18px rgb(33 26 56 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(33 26 56 / 0.08), 0 18px 36px rgb(33 26 56 / 0.14);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 *,
@@ -41,15 +44,17 @@ body {
 h1,
 h2,
 h3 {
+  text-wrap: balance;
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
   margin: 0 0 0.5em;
 }
 
 p {
   margin: 0 0 1em;
+  text-wrap: pretty;
 }
 
 a {
@@ -58,6 +63,7 @@ a {
 
 ::selection {
   background: var(--color-sun);
+  color: var(--color-ink);
 }
 
 :focus-visible {
@@ -75,42 +81,104 @@ a {
 }
 
 .section-title {
-  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  font-size: clamp(2.1rem, 5vw, 3.25rem);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  color: var(--color-thread-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  width: 1.75rem;
+  height: 2px;
+  background: currentColor;
+  content: '';
+}
+
+/* Scroll reveal: only hidden once JS has flagged the document. */
+.js [data-reveal] {
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity 0.6s var(--ease), translate 0.6s var(--ease);
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  translate: 0 0;
 }
 
 .section-lead {
-  max-width: 40ch;
+  max-width: 44ch;
   color: var(--color-ink-soft);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 
 .button {
-  display: inline-block;
-  padding: 0.8rem 1.5rem;
-  border: 2px solid var(--color-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.7rem 1.6rem;
+  border: 1px solid var(--color-ink);
   border-radius: 999px;
-  background: var(--color-sun);
-  box-shadow: var(--shadow);
-  color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-paper);
   font: inherit;
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s, color 0.2s;
 }
 
 .button:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--color-ink);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+  background: var(--color-thread);
+  border-color: var(--color-thread);
 }
 
 .button:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--color-ink);
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .button--ghost {
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.button--ghost:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--color-ink);
+  border-radius: 999px;
   background: var(--color-paper);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
 }
 
 .visually-hidden {
@@ -122,13 +190,80 @@ a {
   white-space: nowrap;
 }
 
+/*
+ * Kilim-inspired motif chain running down both sides of the page. Nested stepped
+ * diamonds between sawtooth borders, drawn as inline SVG (see docs/ for the grid).
+ * Both bands sit near the screen edges, running the full height of the page content. Wide screens get the full band in the empty margins; narrower screens only
+ * get a thin sawtooth edge inside the content gutter.
+ */
+main {
+  position: relative;
+}
+
+main::before,
+main::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 9px;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%203%2015%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%220%22%20y=%220%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%222%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%227%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2212%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2214%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3C/svg%3E") repeat-y 0 0 / 9px auto;
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  animation: motif-in 1.2s var(--ease) 0.2s forwards;
+}
+
+main::before {
+  left: 0.5rem;
+}
+
+main::after {
+  right: 0.5rem;
+  scale: -1 1;
+}
+
+@media (min-width: 1300px) {
+  main::before,
+  main::after {
+    width: 57px;
+    background-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2019%2015%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20x=%220%22%20y=%220%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%220%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%229%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%222%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%228%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%229%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2210%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2216%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2217%22%20y=%222%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%227%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%228%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2210%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2211%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%223%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%226%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%227%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%229%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2211%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2212%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2218%22%20y=%224%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%225%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%226%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%228%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2210%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2212%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2213%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2218%22%20y=%225%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%224%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%225%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%227%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%229%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2211%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2213%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2214%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%226%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%227%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%223%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%224%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%226%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%228%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%229%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2210%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2212%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2214%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2215%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2216%22%20y=%227%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2217%22%20y=%227%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%224%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%225%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%227%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%229%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2211%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2213%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2214%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%228%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%225%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%226%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%228%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2210%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2212%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2213%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2218%22%20y=%229%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%226%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%227%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%229%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%2211%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2212%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2218%22%20y=%2210%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%220%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%227%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%228%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2210%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2211%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%2211%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%2212%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%222%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%228%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%229%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2210%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2216%22%20y=%2212%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2217%22%20y=%2212%22%20width=%222%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%221%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%229%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23f0c24b%22/%3E%3Crect%20x=%2217%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%2213%22%20width=%221%22%20height=%221%22%20fill=%22%23211a38%22/%3E%3Crect%20x=%220%22%20y=%2214%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3Crect%20x=%2218%22%20y=%2214%22%20width=%221%22%20height=%221%22%20fill=%22%23c9391b%22/%3E%3C/svg%3E");
+    background-size: 57px auto;
+  }
+
+  main::before {
+    left: 1rem;
+  }
+
+  main::after {
+    right: 1rem;
+  }
+}
+
+@keyframes motif-in {
+  to {
+    opacity: 0.9;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
+  .js [data-reveal] {
+    opacity: 1;
+    translate: none;
+  }
+
   * {
     transition: none !important;
     animation: none !important;
+  }
+
+  main::before,
+  main::after {
+    animation: none;
+    opacity: 0.9;
   }
 }

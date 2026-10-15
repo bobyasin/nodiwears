@@ -111,3 +111,40 @@ describe('production domain', () => {
     expect(robots).not.toMatch(/^Disallow:\s*\/\s*$/m);
   });
 });
+
+describe('deploy workflow', () => {
+  const workflow = read('.github/workflows/deploy.yml');
+  const step = (name: string) => workflow.indexOf(`- name: ${name}`);
+
+  it('should deploy only from main, and let pull requests and manual runs try the pipeline', () => {
+    expect(workflow).toMatch(/push:\n\s+branches: \[main\]/);
+    expect(workflow).toMatch(/pull_request:\n\s+branches: \[main\]/);
+    expect(workflow).toContain('workflow_dispatch:');
+    expect(workflow).toMatch(/- name: Deploy\n\s+if: github\.ref == 'refs\/heads\/main'/);
+  });
+
+  it('should run the tests and the build before it checks credentials and deploys', () => {
+    expect(step('Test')).toBeGreaterThan(-1);
+    expect(step('Test')).toBeLessThan(step('Build'));
+    expect(step('Build')).toBeLessThan(step('Check Cloudflare credentials'));
+    expect(step('Check Cloudflare credentials')).toBeLessThan(step('Deploy'));
+  });
+
+  it('should verify the Cloudflare credentials without deploying', () => {
+    expect(workflow).toContain('run: npx wrangler whoami');
+  });
+
+  it('should read the Cloudflare credentials from repository secrets', () => {
+    expect(workflow).toContain('${{ secrets.CLOUDFLARE_API_TOKEN }}');
+    expect(workflow).toContain('${{ secrets.CLOUDFLARE_ACCOUNT_ID }}');
+  });
+
+  it('should use the Node version pinned for the project and a read-only token', () => {
+    expect(workflow).toContain('node-version-file: .node-version');
+    expect(workflow).toMatch(/permissions:\n\s+contents: read/);
+  });
+
+  it('should never run two deploys of the same branch at the same time', () => {
+    expect(workflow).toContain('group: deploy-${{ github.ref }}');
+  });
+});

@@ -5,6 +5,8 @@ export interface CatalogNode {
   id: string;
   title: Localized<string>;
   children?: readonly CatalogNode[];
+  /** Photos of a design; placeholders are generated while this is empty. */
+  images?: readonly string[];
 }
 
 export interface CatalogDesign {

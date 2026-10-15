@@ -106,59 +106,88 @@ const mailCopy = { subject: t.mailSubject, nameLabel: t.mailNameLabel, emailLabe
 <style>
 	.contact {
 		margin-top: 2rem;
-		border-block: 3px solid var(--color-ink);
-		background: var(--color-mint);
+		border-block: 1px solid var(--color-line);
+		background: var(--color-paper);
 	}
 
 	.layout {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 3rem;
+		grid-template-columns: 1fr 1.1fr;
+		gap: 3.5rem;
 		align-items: start;
 	}
 
 	.info {
-		margin: 1.5rem 0 0;
+		display: grid;
+		gap: 0.75rem;
+		margin: 1.75rem 0 0;
 		padding: 0;
 		list-style: none;
 		color: var(--color-ink-soft);
 	}
 
 	.info li {
-		margin-bottom: 0.4rem;
+		display: grid;
+		gap: 0.1rem;
+		padding: 0.9rem 1.1rem;
+		border: 1px solid var(--color-line);
+		border-radius: 12px;
+		background: var(--color-cream);
+		transition: border-color 0.2s, transform 0.2s var(--ease);
+	}
+
+	.info li:hover {
+		border-color: var(--color-line-strong);
+		transform: translateX(4px);
+	}
+
+	.info strong {
+		color: var(--color-ink);
+		font-size: 0.78rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
 	}
 
 	form {
 		display: grid;
 		gap: 1rem;
-		padding: 1.75rem;
-		border: 3px solid var(--color-ink);
-		border-radius: var(--radius);
-		background: var(--color-paper);
+		padding: 2rem;
+		border: 1px solid var(--color-line);
+		border-radius: 20px;
+		background: var(--color-cream);
 		box-shadow: var(--shadow);
 	}
 
 	label {
 		display: grid;
 		gap: 0.35rem;
+		font-size: 0.92rem;
 		font-weight: 600;
 	}
 
 	input,
 	textarea {
-		padding: 0.75rem 0.9rem;
-		border: 2px solid var(--color-ink);
+		padding: 0.8rem 1rem;
+		border: 1px solid var(--color-line-strong);
 		border-radius: 12px;
-		background: var(--color-cream);
+		background: var(--color-paper);
 		color: var(--color-ink);
 		font: inherit;
+		transition: border-color 0.15s, box-shadow 0.15s;
 	}
 
 	input:focus,
 	textarea:focus {
-		background: #fff;
-		box-shadow: 3px 3px 0 var(--color-thread);
+		border-color: var(--color-thread);
+		box-shadow: 0 0 0 4px rgb(201 57 27 / 0.14);
 		outline: none;
+	}
+
+	.form-status:not(:empty) {
+		padding: 0.6rem 0.9rem;
+		border: 1px solid var(--color-thread);
+		border-radius: 10px;
+		background: #fff1ed;
 	}
 
 	.note {
@@ -178,6 +207,10 @@ const mailCopy = { subject: t.mailSubject, nameLabel: t.mailNameLabel, emailLabe
 		.layout {
 			grid-template-columns: 1fr;
 			gap: 2rem;
+		}
+
+		form {
+			padding: 1.4rem;
 		}
 	}
 </style>

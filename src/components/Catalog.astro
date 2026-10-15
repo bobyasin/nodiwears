@@ -3,6 +3,7 @@ import { catalogTree, collectDesigns } from '../data/site';
 import type { Locale } from '../i18n/config';
 import { getDesignPath } from '../i18n/paths';
 import { ui } from '../i18n/ui';
+import { getDesignImages } from '../lib/design-images';
 
 interface Props {
 	locale: Locale;
@@ -12,151 +13,462 @@ const { locale } = Astro.props;
 const t = ui[locale].catalog;
 const designs = collectDesigns(catalogTree, locale);
 const COLOR_COUNT = 4;
-const colorByCollection = new Map(catalogTree.map((collection, index) => [collection.id, index % COLOR_COUNT]));
+const groups = catalogTree.map((collection, index) => ({
+	id: collection.id,
+	title: collection.title[locale],
+	color: index % COLOR_COUNT,
+	designs: designs.filter((design) => design.rootId === collection.id),
+}));
 ---
 
 <section class="section" id="katalog">
 	<div class="container">
-		<h2 class="section-title">{t.title}</h2>
+		<h2 class="section-title" data-reveal>{t.title}</h2>
 
-		<div class="filters" role="group" aria-label={t.filterLabel}>
-			<button type="button" data-filter="all" aria-pressed="true">{t.all}</button>
-			{
-				catalogTree.map((collection) => (
-					<button type="button" data-filter={collection.id} aria-pressed="false">
-						{collection.title[locale]}
-					</button>
-				))
-			}
+		<div class="layout">
+			<nav class="menu" aria-label={t.menuLabel} data-reveal>
+				{
+					groups.map((group, index) => (
+						<details name="collection" open={index === 0} data-color={group.color}>
+							<summary>
+								<span class="group-title">{group.title}</span>
+								<span class="count" aria-hidden="true">{group.designs.length}</span>
+							</summary>
+							<ul>
+								{group.designs.map((design) => (
+									<li>
+										<a
+											href={getDesignPath(locale, design.node.id)}
+											data-title={design.title}
+											data-collection={group.title}
+											data-color={group.color}
+											data-images={JSON.stringify(getDesignImages(design.node.id, design.node.images))}
+										>
+											{design.title}
+										</a>
+									</li>
+								))}
+							</ul>
+						</details>
+					))
+				}
+			</nav>
+
+			<div
+				class="preview"
+				id="catalog-preview"
+				data-color="0"
+				data-slide-label={t.slide}
+				role="group"
+				aria-label={t.previewLabel}
+				hidden
+			>
+				<div class="slides"></div>
+				<a class="cover" href="#katalog" tabindex="-1" aria-hidden="true">
+					<span class="view">{t.view} <span aria-hidden="true">↗</span></span>
+				</a>
+				<div class="caption">
+					<span class="label"></span>
+					<span class="name"></span>
+				</div>
+				<div class="dots"></div>
+			</div>
 		</div>
-
-		<ul class="grid">
-			{
-				designs.map(({ node, title, collection, rootId }) => (
-					<li data-root={rootId} data-color={colorByCollection.get(rootId)}>
-						<a class="card" href={getDesignPath(locale, node.id)}>
-							<span class="label">{collection}</span>
-							<span class="name">{title}</span>
-						</a>
-					</li>
-				))
-			}
-		</ul>
 	</div>
 </section>
 
 <script>
-	import { ALL_FILTER, matchesFilter } from '../lib/catalog-filter';
+	const AUTO_MS = 2600;
 
-	const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('#katalog [data-filter]'));
-	const items = Array.from(document.querySelectorAll<HTMLElement>('#katalog [data-root]'));
+	const menu = document.querySelector<HTMLElement>('#katalog .menu');
+	const preview = document.querySelector<HTMLElement>('#catalog-preview');
+	const slides = preview?.querySelector<HTMLElement>('.slides');
+	const cover = preview?.querySelector<HTMLAnchorElement>('.cover');
+	const label = preview?.querySelector<HTMLElement>('.label');
+	const name = preview?.querySelector<HTMLElement>('.name');
+	const dots = preview?.querySelector<HTMLElement>('.dots');
+	const canAnimate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-	function applyFilter(filter: string) {
-		for (const button of buttons) {
-			button.setAttribute('aria-pressed', String(button.dataset.filter === filter));
-		}
+	let current = '';
+	let index = 0;
+	let timer: number | undefined;
+	let paused = false;
 
-		for (const item of items) {
-			item.hidden = !matchesFilter(filter, item.dataset.root ?? '');
+	function select(next: number) {
+		const frames = slides?.children ?? [];
+		const buttons = dots?.children ?? [];
+
+		index = (next + frames.length) % Math.max(frames.length, 1);
+
+		for (let i = 0; i < frames.length; i++) {
+			frames[i].classList.toggle('is-active', i === index);
+			buttons[i]?.setAttribute('aria-current', String(i === index));
 		}
 	}
 
-	for (const button of buttons) {
-		button.addEventListener('click', () => applyFilter(button.dataset.filter ?? ALL_FILTER));
+	function restartTimer(count: number) {
+		window.clearInterval(timer);
+
+		if (canAnimate && count > 1) {
+			timer = window.setInterval(() => {
+				if (!paused && !document.hidden) {
+					select(index + 1);
+				}
+			}, AUTO_MS);
+		}
+	}
+
+	function show(link: HTMLAnchorElement) {
+		if (!preview || !slides || !dots || !cover || !label || !name || link.href === current) {
+			return;
+		}
+
+		current = link.href;
+
+		let urls: string[] = [];
+
+		try {
+			urls = JSON.parse(link.dataset.images ?? '[]') as string[];
+		} catch {
+			urls = [];
+		}
+
+		const template = preview.dataset.slideLabel ?? '{n}';
+
+		label.textContent = link.dataset.collection ?? '';
+		name.textContent = link.dataset.title ?? '';
+		cover.href = link.href;
+		preview.dataset.color = link.dataset.color ?? '0';
+		slides.replaceChildren(
+			...urls.map((url) => {
+				const image = document.createElement('img');
+
+				image.src = url;
+				image.alt = '';
+				image.decoding = 'async';
+				return image;
+			}),
+		);
+		dots.replaceChildren(
+			...urls.map((_, position) => {
+				const button = document.createElement('button');
+
+				button.type = 'button';
+				button.setAttribute('aria-label', template.replace('{n}', String(position + 1)));
+				button.addEventListener('click', () => {
+					select(position);
+					restartTimer(urls.length);
+				});
+				return button;
+			}),
+		);
+		preview.classList.remove('is-in');
+		void preview.offsetWidth;
+		preview.classList.add('is-in');
+		select(0);
+		restartTimer(urls.length);
+	}
+
+	if (menu && preview) {
+		const first = menu.querySelector<HTMLAnchorElement>('details[open] a[data-title]');
+
+		if (first) {
+			show(first);
+			preview.hidden = false;
+		}
+
+		const follow = (event: Event) => {
+			const link = (event.target as Element).closest<HTMLAnchorElement>('a[data-title]');
+
+			if (link) {
+				show(link);
+			}
+		};
+
+		menu.addEventListener('pointerover', follow);
+		menu.addEventListener('focusin', follow);
+		preview.addEventListener('pointerenter', () => (paused = true));
+		preview.addEventListener('pointerleave', () => (paused = false));
+
+		// Opening a collection previews its first design.
+		for (const group of menu.querySelectorAll<HTMLDetailsElement>('details')) {
+			group.addEventListener('toggle', () => {
+				const link = group.open ? group.querySelector<HTMLAnchorElement>('a[data-title]') : null;
+
+				if (link) {
+					show(link);
+				}
+			});
+		}
 	}
 </script>
 
 <style>
-	.filters {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin: 1.75rem 0;
-	}
-
-	.filters button {
-		padding: 0.5rem 1.2rem;
-		border: 2px solid var(--color-ink);
-		border-radius: 999px;
-		background: var(--color-paper);
-		color: var(--color-ink);
-		font: inherit;
-		font-weight: 700;
-		cursor: pointer;
-		transition: background 0.15s, transform 0.15s;
-	}
-
-	.filters button:hover {
-		transform: translateY(-2px) rotate(-2deg);
-	}
-
-	.filters button[aria-pressed='true'] {
-		background: var(--color-sun);
-		box-shadow: 3px 3px 0 var(--color-ink);
-	}
-
-	.grid {
+	.layout {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-		gap: 1rem;
-		margin: 0;
-		padding: 0;
-		list-style: none;
+		grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+		gap: clamp(2rem, 6vw, 5rem);
+		align-items: start;
+		margin-top: 2rem;
 	}
 
-	.grid li[hidden] {
+	.menu {
+		border-top: 1px solid var(--color-line-strong);
+	}
+
+	details {
+		border-bottom: 1px solid var(--color-line-strong);
+	}
+
+	summary {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 0;
+		cursor: pointer;
+		list-style: none;
+		transition: color 0.2s;
+	}
+
+	summary::-webkit-details-marker {
 		display: none;
 	}
 
-	.grid li[data-color='0'] {
+	summary::after {
+		margin-left: auto;
+		color: var(--color-thread);
+		font-size: 1.5rem;
+		font-weight: 300;
+		line-height: 1;
+		content: '+';
+		transition: rotate 0.3s var(--ease);
+	}
+
+	details[open] summary::after {
+		rotate: 45deg;
+	}
+
+	summary:hover .group-title {
+		color: var(--color-thread-dark);
+	}
+
+	.group-title {
+		font-family: var(--font-display);
+		font-size: 1.6rem;
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		transition: color 0.2s;
+	}
+
+	.count {
+		color: var(--color-ink-soft);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	ul {
+		display: grid;
+		gap: 0.1rem;
+		margin: 0;
+		padding: 0 0 1.1rem;
+		list-style: none;
+		animation: open 0.35s var(--ease);
+	}
+
+	@keyframes open {
+		from {
+			opacity: 0;
+			translate: 0 -6px;
+		}
+	}
+
+	li a {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.4rem 0;
+		color: var(--color-ink-soft);
+		text-decoration: none;
+		transition: color 0.2s, translate 0.25s var(--ease);
+	}
+
+	li a::before {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--color-line-strong);
+		content: '';
+		transition: background 0.2s, scale 0.25s var(--ease);
+	}
+
+	li a:hover,
+	li a:focus-visible {
+		color: var(--color-ink);
+		translate: 6px 0;
+	}
+
+	li a:hover::before,
+	li a:focus-visible::before {
+		background: var(--color-thread);
+		scale: 1.5;
+	}
+
+	.preview {
+		position: relative;
+		aspect-ratio: 3 / 2;
+		overflow: hidden;
+		border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+		border-radius: 20px;
+		background: var(--card, var(--color-lilac));
+		transition: box-shadow 0.3s var(--ease);
+	}
+
+	.preview:hover {
+		box-shadow: var(--shadow-lift);
+	}
+
+	.preview[data-color='0'] {
 		--card: var(--color-lilac);
 	}
 
-	.grid li[data-color='1'] {
+	.preview[data-color='1'] {
 		--card: var(--color-mint);
 	}
 
-	.grid li[data-color='2'] {
+	.preview[data-color='2'] {
 		--card: var(--color-pink);
 	}
 
-	.grid li[data-color='3'] {
-		--card: var(--color-sun);
+	.preview[data-color='3'] {
+		--card: #f8ebc6;
 	}
 
-	.card {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-		gap: 1.5rem;
-		aspect-ratio: 1;
-		padding: 1rem 1.1rem;
-		border: 3px solid var(--color-ink);
-		border-radius: var(--radius);
-		background: var(--card, var(--color-paper));
-		box-shadow: var(--shadow);
-		text-decoration: none;
-		transition: transform 0.15s, box-shadow 0.15s;
+	.slides {
+		position: absolute;
+		inset: 0;
 	}
 
-	.card:hover {
-		transform: translate(-2px, -2px) rotate(-1.5deg);
-		box-shadow: 7px 7px 0 var(--color-ink);
+	.slides :global(img) {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		opacity: 0;
+		scale: 1.04;
+		transition: opacity 0.7s ease, scale 4s ease-out;
+	}
+
+	.slides :global(img.is-active) {
+		opacity: 1;
+		scale: 1;
+	}
+
+	/* the whole panel opens the design; the dots sit above it */
+	.cover {
+		position: absolute;
+		inset: 0;
+		display: block;
+	}
+
+	.view {
+		position: absolute;
+		top: 1.25rem;
+		right: 1.25rem;
+		padding: 0.45rem 1rem;
+		border-radius: 999px;
+		background: var(--color-paper);
+		color: var(--color-ink);
+		font-size: 0.9rem;
+		font-weight: 600;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.cover:hover .view,
+	.cover:focus-visible .view {
+		background: var(--color-thread);
+		color: var(--color-paper);
+	}
+
+	.caption {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: grid;
+		gap: 0.2rem;
+		padding: 3rem 1.5rem 1.25rem;
+		background: linear-gradient(transparent, rgb(33 26 56 / 0.72));
+		color: var(--color-paper);
+		pointer-events: none;
+	}
+
+	.preview.is-in .label,
+	.preview.is-in .name {
+		animation: swap 0.45s var(--ease) both;
+	}
+
+	.preview.is-in .name {
+		animation-delay: 0.05s;
+	}
+
+	@keyframes swap {
+		from {
+			opacity: 0;
+			translate: 0 10px;
+		}
 	}
 
 	.label {
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		font-weight: 700;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.12em;
+		opacity: 0.85;
+		text-transform: uppercase;
 	}
 
 	.name {
 		font-family: var(--font-display);
-		font-size: 1.4rem;
-		font-weight: 800;
-		letter-spacing: -0.03em;
+		font-size: clamp(1.8rem, 4vw, 2.8rem);
+		font-weight: 600;
+		letter-spacing: -0.02em;
 		line-height: 1.05;
-		hyphens: auto;
 		overflow-wrap: anywhere;
+	}
+
+	.dots {
+		position: absolute;
+		right: 1.25rem;
+		bottom: 1.35rem;
+		display: flex;
+		gap: 0.4rem;
+	}
+
+	.dots :global(button) {
+		width: 0.55rem;
+		height: 0.55rem;
+		padding: 0;
+		border: 0;
+		border-radius: 999px;
+		background: rgb(255 255 255 / 0.55);
+		cursor: pointer;
+		transition: width 0.3s var(--ease), background 0.2s;
+	}
+
+	.dots :global(button[aria-current='true']) {
+		width: 1.5rem;
+		background: var(--color-paper);
+	}
+
+	@media (max-width: 820px) {
+		.layout {
+			grid-template-columns: minmax(0, 1fr);
+			margin-top: 1.25rem;
+		}
+
+		.preview {
+			order: -1;
+			aspect-ratio: 4 / 3;
+		}
 	}
 </style>
